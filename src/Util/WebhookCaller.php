@@ -18,9 +18,6 @@ class WebhookCaller
     private HttpClientInterface $client;
 
     /**
-     * @param string $StringData
-     * @param string $webhookURL
-     * @param HttpClientInterface|null $client
      */
     public function __construct(string $StringData, string $webhookURL, ?HttpClientInterface $client = null)
     {
@@ -30,7 +27,6 @@ class WebhookCaller
     }
 
     /**
-     * @return string
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface

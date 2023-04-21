@@ -44,7 +44,7 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public function activate(Composer $composer, IOInterface $io)
+    public function activate(Composer $composer, IOInterface $io): void
     {
         $this->composer = $composer;
         $this->io = $io;
@@ -57,11 +57,11 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
         $this->fileOutputter = Factory::createFileOutputter($this->config->getOutputFileFormat(), $this->config->getGitlabHosts());
     }
 
-    public function deactivate(Composer $composer, IOInterface $io)
+    public function deactivate(Composer $composer, IOInterface $io): void
     {
     }
 
-    public function uninstall(Composer $composer, IOInterface $io)
+    public function uninstall(Composer $composer, IOInterface $io): void
     {
     }
 
