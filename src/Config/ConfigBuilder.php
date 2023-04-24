@@ -26,7 +26,7 @@ class ConfigBuilder
     {
         $this->reset();
 
-        $gitlabHosts = $extra['gitlab-hosts'] ?? null;
+        $gitlabHosts = $extra['gitlab-hosts'] ?? [];
         $changelogsDirPath = $extra['changelogs-dir-path'] ?? null;
         $outputFileFormat =  $extra['output-file-format'] ?? FileOutputter::TEXT_FORMAT;
         $writeSummaryFile = $extra['write-summary-file'] ?? true;
@@ -38,13 +38,11 @@ class ConfigBuilder
             $gitlabHosts = [];
         }
 
-        if($changelogsDirPath != null && 0 == strlen(trim($changelogsDirPath))){
+        if($changelogsDirPath != null && 0 === strlen(trim($changelogsDirPath))){
             $this->warnings[] = '"changelogs-dir-path" is specified but empty. Ignoring and using default changelogs dir path.';
-
-            $changelogsDirPath = null;
         }
 
-        if (!in_array($extra['output-file-format'], self::$validOutputFormatValues, true)) {
+        if (!in_array($outputFileFormat, self::$validOutputFormatValues, true)) {
             $this->warnings[] = self::createWarningFromInvalidValue(
                 $extra,
                 'output-file-format',
@@ -58,7 +56,6 @@ class ConfigBuilder
         if($writeSummaryFile != null && 0 != strlen($writeSummaryFile) && 0 == strcmp('false', $writeSummaryFile)){
             $writeSummaryFile = false;
         }else{
-            $this->warnings[] = '"write-summary-file" is not correctly specified. Ignoring and using default state.';
             $writeSummaryFile = true;
         }
 
