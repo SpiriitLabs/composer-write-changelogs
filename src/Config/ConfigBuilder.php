@@ -26,55 +26,45 @@ class ConfigBuilder
     {
         $this->reset();
 
-        $gitlabHosts = [];
-        $changelogsDirPath = null;
-        $outputFileFormat = FileOutputter::TEXT_FORMAT;
-        $writeSummaryFile = true;
-        $webhookUrl = null;
+        $gitlabHosts = $extra['gitlab-hosts'] ?? null;
+        $changelogsDirPath = $extra['changelogs-dir-path'] ?? null;
+        $outputFileFormat =  $extra['output-file-format'] ?? FileOutputter::TEXT_FORMAT;
+        $writeSummaryFile = $extra['write-summary-file'] ?? true;
+        $webhookUrl = $extra['webhook-url'] ?? null;
 
-        if (array_key_exists('gitlab-hosts', $extra)) {
-            if (!is_array($extra['gitlab-hosts'])) {
-                $this->warnings[] = '"gitlab-hosts" is specified but should be an array. Ignoring.';
-            } else {
-                $gitlabHosts = (array) $extra['gitlab-hosts'];
-            }
+        if(!is_array($gitlabHosts)){
+            $this->warnings[] = '"gitlab-hosts" is specified but should be an array. Ignoring.';
+
+            $gitlabHosts = null;
         }
 
-        if (array_key_exists('changelogs-dir-path', $extra)) {
-            if (0 === strlen(trim($extra['changelogs-dir-path']))) {
-                $this->warnings[] = '"changelogs-dir-path" is specified but empty. Ignoring and using default changelogs dir path.';
-            } else {
-                $changelogsDirPath = $extra['changelogs-dir-path'];
-            }
+        if($changelogsDirPath != null && 0 == strlen(trim($changelogsDirPath))){
+            $this->warnings[] = '"changelogs-dir-path" is specified but empty. Ignoring and using default changelogs dir path.';
+
+            $changelogsDirPath = null;
         }
 
-        if (array_key_exists('output-file-format', $extra)) {
-            if (in_array($extra['output-file-format'], self::$validOutputFormatValues, true)) {
-                $outputFileFormat = $extra['output-file-format'];
-            } else {
-                $this->warnings[] = self::createWarningFromInvalidValue(
-                    $extra,
-                    'output-file-format',
-                    $outputFileFormat,
-                    sprintf('Valid options are "%s".', implode('", "', self::$validOutputFormatValues))
-                );
-            }
+        if (!in_array($extra['output-file-format'], self::$validOutputFormatValues, true)) {
+            $this->warnings[] = self::createWarningFromInvalidValue(
+                $extra,
+                'output-file-format',
+                $outputFileFormat,
+                sprintf('Valid options are "%s".', implode('", "', self::$validOutputFormatValues))
+            );
+
+            $outputFileFormat = FileOutputter::TEXT_FORMAT;
         }
 
-        if(array_key_exists('write-summary-file', $extra)){
-            if(0 === strlen($extra['write-summary-file'])){
-                $this->warnings[] = '"write-summary-file" is specified but empty. Ignoring and using default state.';
-            }else if(strcmp('false', $extra['write-summary-file']) == 0){
-                $writeSummaryFile = false;
-            }
+        if($writeSummaryFile != null && 0 != strlen($writeSummaryFile) && 0 == strcmp('false', $writeSummaryFile)){
+            $writeSummaryFile = false;
+        }else{
+            $this->warnings[] = '"write-summary-file" is not correctly specified. Ignoring and using default state.';
+            $writeSummaryFile = true;
         }
 
-        if(array_key_exists('webhook-url', $extra)){
-            if(0 === strlen($extra['webhook-url'])){
-                $this->warnings[] = '"webhook-url" is specified but empty, ignoring.';
-            }else {
-                $webhookUrl = $extra['webhook-url'];
-            }
+        if($webhookUrl != null && 0 == strlen($webhookUrl)){
+            $this->warnings[] = '"webhookUrl" is specified but empty. Ignoring webhook';
+            $webhookUrl = null;
         }
 
         return new Config($gitlabHosts, $changelogsDirPath, $outputFileFormat, $writeSummaryFile, $webhookUrl);
