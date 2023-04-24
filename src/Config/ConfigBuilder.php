@@ -35,7 +35,7 @@ class ConfigBuilder
         if(!is_array($gitlabHosts)){
             $this->warnings[] = '"gitlab-hosts" is specified but should be an array. Ignoring.';
 
-            $gitlabHosts = null;
+            $gitlabHosts = [];
         }
 
         if($changelogsDirPath != null && 0 == strlen(trim($changelogsDirPath))){
