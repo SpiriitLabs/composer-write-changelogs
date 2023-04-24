@@ -98,6 +98,57 @@ class ConfigBuilderTest extends TestCase
     /**
      * @test
      */
+    public function test_it_warns_when_write_summary_file_is_specified_but_empty(): void
+    {
+        $extra = [
+            'write-summary-file' => '',
+        ];
+
+        $config = $this->SUT->build($extra);
+
+        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
+        $this->assertEmpty($config->getGitlabHosts());
+
+        $this->assertTrue($config->isWriteSummaryFile());
+    }
+
+    /**
+     * @test
+     */
+    public function test_it_warns_when_write_summary_file_is_invalid(): void
+    {
+        $extra = [
+            'write-summary-file' => '   ',
+        ];
+
+        $config = $this->SUT->build($extra);
+
+        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
+        $this->assertEmpty($config->getGitlabHosts());
+
+        $this->assertTrue($config->isWriteSummaryFile());
+    }
+
+    /**
+     * @test
+     */
+    public function test_it_warns_when_write_summary_file_is_specified_false(): void
+    {
+        $extra = [
+            'write-summary-file' => 'false',
+        ];
+
+        $config = $this->SUT->build($extra);
+
+        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
+        $this->assertEmpty($config->getGitlabHosts());
+
+        $this->assertFalse($config->isWriteSummaryFile());
+    }
+
+    /**
+     * @test
+     */
     public function test_it_accepts_valid_setup(): void
     {
         $extra = [
