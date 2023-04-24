@@ -23,6 +23,7 @@ use Spiriit\ComposerWriteChangelogs\Config\ConfigBuilder;
 use Spiriit\ComposerWriteChangelogs\Config\ConfigLocator;
 use Spiriit\ComposerWriteChangelogs\Outputter\FileOutputter;
 use Spiriit\ComposerWriteChangelogs\Outputter\Outputter;
+use Spiriit\ComposerWriteChangelogs\Util\WebhookCaller;
 
 class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
 {
@@ -43,7 +44,7 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public function activate(Composer $composer, IOInterface $io)
+    public function activate(Composer $composer, IOInterface $io): void
     {
         $this->composer = $composer;
         $this->io = $io;
@@ -56,11 +57,11 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
         $this->fileOutputter = Factory::createFileOutputter($this->config->getOutputFileFormat(), $this->config->getGitlabHosts());
     }
 
-    public function deactivate(Composer $composer, IOInterface $io)
+    public function deactivate(Composer $composer, IOInterface $io): void
     {
     }
 
-    public function uninstall(Composer $composer, IOInterface $io)
+    public function uninstall(Composer $composer, IOInterface $io): void
     {
     }
 
@@ -148,16 +149,23 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
         }
 
         $this->doWriteSummaryFile();
-        //TODO: $this->handleWebhookCall();
+        $this->handleWebhookCall();
     }
 
-    /*TODO: private function handleWebhookCall()
+    private function handleWebhookCall(): void
     {
-        if (!empty($this->config->getWebhookPath())) {
-            //TODO init un call api vers l'adresse
-            // faire un service a part pour cette logique
+        if ($this->config->getWebhookURL() != null) {
+            $output = $this->fileOutputter->getOutput("json");
+
+            if(strcmp('No changelogs summary', $output) == 0){
+                return;
+            }
+
+            $caller = new WebhookCaller($output, $this->config->getWebhookURL());
+
+            $caller->callWebhook();
         }
-    }*/
+    }
 
     private function doWriteSummaryFile(): void
     {

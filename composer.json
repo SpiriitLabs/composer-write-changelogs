@@ -18,8 +18,10 @@
     ],
     "require": {
         "php": ">=7.4",
+        "ext-curl": "*",
         "ext-json": "*",
-        "composer-plugin-api": "^1.0 || ^2.0"
+        "composer-plugin-api": "^1.0 || ^2.0",
+        "symfony/http-client": "^5.4 || ^6.2"
     },
     "require-dev": {
         "composer/composer": "^1.0.0-alpha10@dev || ^2.0@dev",

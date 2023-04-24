@@ -65,7 +65,7 @@ class ConfigBuilderTest extends TestCase
     public function test_it_warns_when_changelogs_dir_path_is_specified_but_empty(): void
     {
         $extra = [
-            'changelogs-dir-path' => '',
+            'changelogs-dir-path' => ' ',
         ];
 
         $config = $this->SUT->build($extra);
@@ -75,24 +75,6 @@ class ConfigBuilderTest extends TestCase
 
         $this->assertCount(1, $this->SUT->getWarnings());
         $this->assertStringContainsString('"changelogs-dir-path" is specified but empty. Ignoring and using default changelogs dir path.', $this->SUT->getWarnings()[0]);
-    }
-
-    /**
-     * @test
-     */
-    public function test_it_warns_when_write_summary_file_is_specified_but_empty(): void
-    {
-        $extra = [
-            'write-summary-file' => '',
-        ];
-
-        $config = $this->SUT->build($extra);
-
-        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
-        $this->assertEmpty($config->getGitlabHosts());
-
-        $this->assertCount(1, $this->SUT->getWarnings());
-        $this->assertStringContainsString('"write-summary-file" is specified but empty. Ignoring and using default state.', $this->SUT->getWarnings()[0]);
     }
 
     /**

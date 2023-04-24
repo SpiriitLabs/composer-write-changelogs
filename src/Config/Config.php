@@ -23,12 +23,15 @@ class Config
 
     private bool $writeSummaryFile;
 
-    public function __construct(array $gitlabHosts, ?string $changelogsDirPath, string $outputFileFormat, bool $writeSummaryFile)
+    private ?string $webhookURL;
+
+    public function __construct(array $gitlabHosts, ?string $changelogsDirPath, string $outputFileFormat, bool $writeSummaryFile, ?string $webhookURL)
     {
         $this->gitlabHosts = $gitlabHosts;
         $this->changelogsDirPath = $changelogsDirPath;
         $this->outputFileFormat = $outputFileFormat;
         $this->writeSummaryFile = $writeSummaryFile;
+        $this->webhookURL = $webhookURL;
     }
 
     public function getGitlabHosts(): array
@@ -51,5 +54,13 @@ class Config
     public function isWriteSummaryFile(): bool
     {
         return $this->writeSummaryFile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWebhookURL(): ?string
+    {
+        return $this->webhookURL;
     }
 }

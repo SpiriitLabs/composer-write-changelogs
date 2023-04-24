@@ -26,7 +26,7 @@ lint: 		## Config files lint
 	vendor/bin/neon-lint .
 
 test: 		## Unit tests
-	$(SF) php vendor/bin/phpunit
+	$(SF) php vendor/bin/phpunit --filter $(or $(FILTER), '.')
 
 cover: 		## Unit tests with coverage
 	XDEBUG_MODE=coverage $(SF) php vendor/bin/simple-phpunit --coverage-xml=cov/xml --coverage-html=cov/html --log-junit=cov/junit.xml

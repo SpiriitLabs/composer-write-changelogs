@@ -12,6 +12,7 @@ You can setup the configuration by adding parameters in `extra` section of your 
           "write-summary-file": "false",
           "changelogs-dir-path": "my/custom/path",
           "output-file-format": "json",
+          "webhook-url": "YOUR-URL",
           "gitlab-hosts": [
             "gitlab.my-company.org"
           ]
@@ -100,5 +101,14 @@ You can disable the plugin by adding `write-summary-file` in the configuration e
 }
 ```
 
-
-
+### Webhook URL
+You can call a webhook with JSON data all times of an summary was created with this configuration.<br/>
+```json
+{
+    "extra": {
+        "composer-write-changelogs": {
+          "webhook-url": "YOUR-URL"
+        }
+    }
+}
+```
