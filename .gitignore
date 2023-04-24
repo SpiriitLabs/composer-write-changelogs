@@ -6,6 +6,7 @@ composer.lock
 package-lock.json
 
 test/temp/*
+test/*.txt
 
 /vendor
 .idea/
