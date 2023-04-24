@@ -73,7 +73,6 @@ class ConfigBuilderTest extends TestCase
         $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
         $this->assertEmpty($config->getGitlabHosts());
 
-        var_dump($this->SUT->getWarnings());
         $this->assertCount(1, $this->SUT->getWarnings());
         $this->assertStringContainsString('"changelogs-dir-path" is specified but empty. Ignoring and using default changelogs dir path.', $this->SUT->getWarnings()[0]);
     }
