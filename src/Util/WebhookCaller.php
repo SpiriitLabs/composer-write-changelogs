@@ -14,16 +14,17 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class WebhookCaller
 {
     private string $stringData;
-    private string $webhookURL;
     private HttpClientInterface $client;
 
     /**
+     * @param string $StringData
+     * @param string $webhookURL
+     * @param HttpClientInterface|null $client
      */
     public function __construct(string $StringData, string $webhookURL, ?HttpClientInterface $client = null)
     {
         $this->stringData = $StringData;
-        $this->webhookURL = $webhookURL;
-        $this->client = $client ?: HttpClient::createForBaseUri($this->webhookURL);
+        $this->client = $client ?: HttpClient::createForBaseUri($webhookURL);
     }
 
     /**
