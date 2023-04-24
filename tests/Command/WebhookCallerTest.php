@@ -38,7 +38,8 @@ class WebhookCallerTest extends TestCase
         if(str_ends_with($webhookUrl, 'ko')){
             self::expectException(ClientException::class);
             $caller->callWebhook();
-        }else {
+        }else
+        {
             self::assertEquals('ok', $caller->callWebhook());
         }
     }
