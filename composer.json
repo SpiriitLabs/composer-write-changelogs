@@ -1,5 +1,5 @@
 {
-    "name": "romainmillan/composer-write-changelogs",
+    "name": "choosik/composer-write-changelogs",
     "type": "composer-plugin",
     "description": "Display and write to textual files changelogs after each composer update",
     "keywords": [
