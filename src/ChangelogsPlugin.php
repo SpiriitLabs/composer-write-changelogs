@@ -37,6 +37,8 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
 
     private FileOutputter $fileOutputter;
 
+    private FileOutputter $webhookOutputter;
+
     private ConfigLocator $configLocator;
 
     private Config $config;
@@ -55,6 +57,11 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
 
         $this->outputter = Factory::createOutputter($this->config->getGitlabHosts());
         $this->fileOutputter = Factory::createFileOutputter($this->config->getOutputFileFormat(), $this->config->getGitlabHosts());
+        $this->webhookOutputter = $this->fileOutputter;
+
+        if (FileOutputter::TEXT_FORMAT === $this->config->getOutputFileFormat()) {
+            $this->webhookOutputter = Factory::createFileOutputter(FileOutputter::JSON_FORMAT, $this->config->getGitlabHosts());
+        }
     }
 
     public function deactivate(Composer $composer, IOInterface $io): void
@@ -95,6 +102,10 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
 
         $this->outputter->addOperation($operation);
         $this->fileOutputter->addOperation($operation);
+
+        if ($this->fileOutputter !== $this->webhookOutputter) {
+            $this->webhookOutputter->addOperation($operation);
+        }
     }
 
     /**
@@ -167,17 +178,28 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
      */
     private function handleWebhookCall(): void
     {
-        if (null !== $this->config->getWebhookURL()) {
-            $output = $this->fileOutputter->getOutput('json');
-
-            if (0 === strcmp('No changelogs summary', $output)) {
-                return;
-            }
-
-            $caller = new WebhookCaller($output, $this->config->getWebhookURL());
-
-            $caller->callWebhook();
+        if (null === $this->config->getWebhookURL()) {
+            return;
         }
+
+        $output = $this->outputWebhookCall();
+
+        if (0 === strcmp('No changelogs summary', $output)) {
+            return;
+        }
+
+        $caller = new WebhookCaller($output, $this->config->getWebhookURL());
+
+        $caller->callWebhook();
+    }
+
+    private function outputWebhookCall(): string
+    {
+        if ($this->fileOutputter !== $this->webhookOutputter) {
+            return $this->webhookOutputter->getOutput(FileOutputter::JSON_FORMAT);
+        }
+
+        return $this->fileOutputter->getOutput(FileOutputter::JSON_FORMAT);
     }
 
     /**
