@@ -20,7 +20,7 @@ composer global require "spiriit/composer-write-changelogs"
 ### Local installation
 You can also install the plugin in a single project with this command
 ```shell
-composer require --dev "spiriit/composer-write-changelogs"
+composer require "spiriit/composer-write-changelogs"
 ```
 
 <br/>
