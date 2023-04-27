@@ -11,63 +11,62 @@
 
 namespace Spiriit\ComposerWriteChangelogs\tests\UrlGenerator;
 
-use LogicException;
 use PHPUnit\Framework\TestCase;
 use Spiriit\ComposerWriteChangelogs\UrlGenerator\BitbucketUrlGenerator;
 use Spiriit\ComposerWriteChangelogs\Version;
 
 class BitbucketUrlGeneratorTest extends TestCase
 {
-    private BitbucketUrlGenerator $SUT;
+    private BitbucketUrlGenerator $bitbucketUrlGenerator;
 
     protected function setUp(): void
     {
-        $this->SUT = new BitbucketUrlGenerator();
+        $this->bitbucketUrlGenerator = new BitbucketUrlGenerator();
     }
 
     /**
      * @test
      */
-    public function test_it_supports_bitbucket_urls(): void
+    public function it_supports_bitbucket_urls(): void
     {
-        $this->assertTrue($this->SUT->supports('https://bitbucket.org/mailchimp/mandrill-api-php.git'));
-        $this->assertTrue($this->SUT->supports('https://bitbucket.org/rogoOOS/rog'));
-        $this->assertTrue($this->SUT->supports('git@bitbucket.org:private/repo.git'));
+        $this->assertTrue($this->bitbucketUrlGenerator->supports('https://bitbucket.org/mailchimp/mandrill-api-php.git'));
+        $this->assertTrue($this->bitbucketUrlGenerator->supports('https://bitbucket.org/rogoOOS/rog'));
+        $this->assertTrue($this->bitbucketUrlGenerator->supports('git@bitbucket.org:private/repo.git'));
     }
 
     /**
      * @test
      */
-    public function test_it_does_not_support_non_bitbucket_urls(): void
+    public function it_does_not_support_non_bitbucket_urls(): void
     {
-        $this->assertFalse($this->SUT->supports('https://github.com/phpunit/phpunit-mock-objects.git'));
-        $this->assertFalse($this->SUT->supports('https://github.com/symfony/console'));
+        $this->assertFalse($this->bitbucketUrlGenerator->supports('https://github.com/phpunit/phpunit-mock-objects.git'));
+        $this->assertFalse($this->bitbucketUrlGenerator->supports('https://github.com/symfony/console'));
     }
 
     /**
      * @test
      */
-    public function test_it_generates_compare_urls_with_or_without_git_extension_in_source_url(): void
+    public function it_generates_compare_urls_with_or_without_git_extension_in_source_url(): void
     {
         $versionFrom = new Version('v1.0.0.0', 'v1.0.0', 'v1.0.0');
         $versionTo = new Version('v1.0.1.0', 'v1.0.1', 'v1.0.1');
 
         $this->assertSame(
-            'https://bitbucket.org/acme/repo/branches/compare/v1.0.1%0Dv1.0.0',
-            $this->SUT->generateCompareUrl(
-                'https://bitbucket.org/acme/repo',
+            'https://bitbucket.org/spiriit/composer-write-changelogs-repository/branches/compare/v1.0.1%0Dv1.0.0',
+            $this->bitbucketUrlGenerator->generateCompareUrl(
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository',
                 $versionFrom,
-                'https://bitbucket.org/acme/repo',
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository',
                 $versionTo
             )
         );
 
         $this->assertSame(
-            'https://bitbucket.org/acme/repo/branches/compare/v1.0.1%0Dv1.0.0',
-            $this->SUT->generateCompareUrl(
-                'https://bitbucket.org/acme/repo.git',
+            'https://bitbucket.org/spiriit/composer-write-changelogs-repository/branches/compare/v1.0.1%0Dv1.0.0',
+            $this->bitbucketUrlGenerator->generateCompareUrl(
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository.git',
                 $versionFrom,
-                'https://bitbucket.org/acme/repo.git',
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository.git',
                 $versionTo
             )
         );
@@ -76,17 +75,17 @@ class BitbucketUrlGeneratorTest extends TestCase
     /**
      * @test
      */
-    public function test_it_generates_compare_urls_with_dev_versions(): void
+    public function it_generates_compare_urls_with_dev_versions(): void
     {
         $versionFrom = new Version('v1.0.9999999.9999999-dev', 'dev-master', 'dev-master 1234abc');
         $versionTo = new Version('v1.0.1.0', 'v1.0.1', 'v1.0.1');
 
         $this->assertSame(
-            'https://bitbucket.org/acme/repo/branches/compare/v1.0.1%0D1234abc',
-            $this->SUT->generateCompareUrl(
-                'https://bitbucket.org/acme/repo.git',
+            'https://bitbucket.org/spiriit/composer-write-changelogs-repository/branches/compare/v1.0.1%0D1234abc',
+            $this->bitbucketUrlGenerator->generateCompareUrl(
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository.git',
                 $versionFrom,
-                'https://bitbucket.org/acme/repo.git',
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository.git',
                 $versionTo
             )
         );
@@ -95,11 +94,11 @@ class BitbucketUrlGeneratorTest extends TestCase
         $versionTo = new Version('9999999-dev', 'dev-master', 'dev-master 6789def');
 
         $this->assertSame(
-            'https://bitbucket.org/acme/repo/branches/compare/6789def%0Dv1.0.0',
-            $this->SUT->generateCompareUrl(
-                'https://bitbucket.org/acme/repo.git',
+            'https://bitbucket.org/spiriit/composer-write-changelogs-repository/branches/compare/6789def%0Dv1.0.0',
+            $this->bitbucketUrlGenerator->generateCompareUrl(
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository.git',
                 $versionFrom,
-                'https://bitbucket.org/acme/repo.git',
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository.git',
                 $versionTo
             )
         );
@@ -108,11 +107,11 @@ class BitbucketUrlGeneratorTest extends TestCase
         $versionTo = new Version('dev-fix/issue', 'dev-fix/issue', 'dev-fix/issue 1234abc');
 
         $this->assertSame(
-            'https://bitbucket.org/acme/repo/branches/compare/1234abc%0Dv1.0.1',
-            $this->SUT->generateCompareUrl(
-                'https://bitbucket.org/acme/repo.git',
+            'https://bitbucket.org/spiriit/composer-write-changelogs-repository/branches/compare/1234abc%0Dv1.0.1',
+            $this->bitbucketUrlGenerator->generateCompareUrl(
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository.git',
                 $versionFrom,
-                'https://bitbucket.org/acme/repo.git',
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository.git',
                 $versionTo
             )
         );
@@ -121,17 +120,17 @@ class BitbucketUrlGeneratorTest extends TestCase
     /**
      * @test
      */
-    public function test_it_generates_compare_urls_across_forks(): void
+    public function it_generates_compare_urls_across_forks(): void
     {
         $versionFrom = new Version('v1.0.0.0', 'v1.0.0', 'v1.0.0');
         $versionTo = new Version('v1.0.1.0', 'v1.0.1', 'v1.0.1');
 
         $this->assertSame(
-            'https://bitbucket.org/acme2/repo/branches/compare/acme2/repo:v1.0.1%0Dacme1/repo:v1.0.0',
-            $this->SUT->generateCompareUrl(
-                'https://bitbucket.org/acme1/repo',
+            'https://bitbucket.org/spiriit2/repo/branches/compare/spiriit2/repo:v1.0.1%0Dspiriit1/repo:v1.0.0',
+            $this->bitbucketUrlGenerator->generateCompareUrl(
+                'https://bitbucket.org/spiriit1/repo',
                 $versionFrom,
-                'https://bitbucket.org/acme2/repo',
+                'https://bitbucket.org/spiriit2/repo',
                 $versionTo
             )
         );
@@ -140,23 +139,23 @@ class BitbucketUrlGeneratorTest extends TestCase
     /**
      * @test
      */
-    public function test_it_does_not_generate_compare_urls_for_unsupported_url(): void
+    public function it_does_not_generate_compare_urls_for_unsupported_url(): void
     {
         $versionFrom = new Version('v1.0.0.0', 'v1.0.0', 'v1.0.0');
         $versionTo = new Version('v1.0.1.0', 'v1.0.1', 'v1.0.1');
 
         $this->assertNull(
-            $this->SUT->generateCompareUrl(
+            $this->bitbucketUrlGenerator->generateCompareUrl(
                 '/home/toto/work/my-package',
                 $versionFrom,
-                'https://bitbucket.org/acme2/repo',
+                'https://bitbucket.org/spiriit2/repo',
                 $versionTo
             )
         );
 
         $this->assertNull(
-            $this->SUT->generateCompareUrl(
-                'https://bitbucket.org/acme1/repo',
+            $this->bitbucketUrlGenerator->generateCompareUrl(
+                'https://bitbucket.org/spiriit1/repo',
                 $versionFrom,
                 '/home/toto/work/my-package',
                 $versionTo
@@ -167,18 +166,18 @@ class BitbucketUrlGeneratorTest extends TestCase
     /**
      * @test
      */
-    public function test_it_throws_exception_when_generating_compare_urls_across_forks_if_a_source_url_is_invalid(): void
+    public function it_throws_exception_when_generating_compare_urls_across_forks_if_a_source_url_is_invalid(): void
     {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Unrecognized url format for bitbucket.org ("https://bitbucket.org/acme2")');
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unrecognized url format for bitbucket.org ("https://bitbucket.org/spiriit2")');
 
         $versionFrom = new Version('v1.0.0.0', 'v1.0.0', 'v1.0.0');
         $versionTo = new Version('v1.0.1.0', 'v1.0.1', 'v1.0.1');
 
-        $this->SUT->generateCompareUrl(
-            'https://bitbucket.org/acme1/repo',
+        $this->bitbucketUrlGenerator->generateCompareUrl(
+            'https://bitbucket.org/spiriit1/repo',
             $versionFrom,
-            'https://bitbucket.org/acme2',
+            'https://bitbucket.org/spiriit2',
             $versionTo
         );
     }
@@ -186,17 +185,17 @@ class BitbucketUrlGeneratorTest extends TestCase
     /**
      * @test
      */
-    public function test_it_generates_compare_urls_with_ssh_source_url(): void
+    public function it_generates_compare_urls_with_ssh_source_url(): void
     {
         $versionFrom = new Version('v1.0.0.0', 'v1.0.0', 'v1.0.0');
         $versionTo = new Version('v1.0.1.0', 'v1.0.1', 'v1.0.1');
 
         $this->assertSame(
-            'https://bitbucket.org/acme/repo/branches/compare/v1.0.1%0Dv1.0.0',
-            $this->SUT->generateCompareUrl(
-                'git@bitbucket.org:acme/repo.git',
+            'https://bitbucket.org/spiriit/composer-write-changelogs-repository/branches/compare/v1.0.1%0Dv1.0.0',
+            $this->bitbucketUrlGenerator->generateCompareUrl(
+                'git@bitbucket.org:spiriit/composer-write-changelogs-repository.git',
                 $versionFrom,
-                'git@bitbucket.org:acme/repo.git',
+                'git@bitbucket.org:spiriit/composer-write-changelogs-repository.git',
                 $versionTo
             )
         );
@@ -205,18 +204,18 @@ class BitbucketUrlGeneratorTest extends TestCase
     /**
      * @test
      */
-    public function test_it_does_not_generate_release_urls(): void
+    public function it_does_not_generate_release_urls(): void
     {
         $this->assertNull(
-            $this->SUT->generateReleaseUrl(
-                'https://bitbucket.org/acme/repo',
+            $this->bitbucketUrlGenerator->generateReleaseUrl(
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository',
                 new Version('v1.0.1.0', 'v1.0.1', 'v1.0.1')
             )
         );
 
         $this->assertNull(
-            $this->SUT->generateReleaseUrl(
-                'https://bitbucket.org/acme/repo.git',
+            $this->bitbucketUrlGenerator->generateReleaseUrl(
+                'https://bitbucket.org/spiriit/composer-write-changelogs-repository.git',
                 new Version('v1.0.1.0', 'v1.0.1', 'v1.0.1')
             )
         );

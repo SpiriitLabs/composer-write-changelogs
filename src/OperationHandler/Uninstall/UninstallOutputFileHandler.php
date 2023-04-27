@@ -29,7 +29,7 @@ class UninstallOutputFileHandler extends AbstractUninstallHandler
 
     public function getOutput(OperationInterface $operation, UrlGenerator $urlGenerator = null): array
     {
-        if (!($operation instanceof UninstallOperation)) {
+        if (!$operation instanceof UninstallOperation) {
             throw new \LogicException('Operation should be an instance of UninstallOperation');
         }
 
@@ -44,9 +44,9 @@ class UninstallOutputFileHandler extends AbstractUninstallHandler
 
         if (FileOutputter::JSON_FORMAT === $this->outputFormat) {
             return $this->getJsonOutput($package, $version);
-        }  
-            return $this->getTextOutput($package, $version);
-        
+        }
+
+        return $this->getTextOutput($package, $version);
     }
 
     private function getJsonOutput(PackageInterface $package, Version $version): array

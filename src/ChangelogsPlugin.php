@@ -86,6 +86,9 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
         ];
     }
 
+    /**
+     * After action on package.
+     */
     public function postPackageOperation(PackageEvent $event): void
     {
         $operation = $event->getOperation();
@@ -94,6 +97,9 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
         $this->fileOutputter->addOperation($operation);
     }
 
+    /**
+     * After the composer update.
+     */
     public function postUpdate(): void
     {
         $this->io->write($this->outputter->getOutput());
@@ -108,7 +114,7 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
      * It's required to avoid composer looking for classes which no longer exist
      * (for example after the plugin is updated).
      *
-     * Lot of classes (like operation handlers, url generators, Outputter, etc)
+     * Lot of classes (like operation handlers, url generators, Outputter, etc.)
      * do not need this because they are already autoloaded at the activation
      * of the plugin.
      */
@@ -117,7 +123,7 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
         /** @var string $file */
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR__, \FilesystemIterator::SKIP_DOTS)) as $file) {
             if ('.php' === substr($file, 0, -4)) {
-                class_exists(__NAMESPACE__ . str_replace('/', '\\', substr($file, \strlen(__DIR__), -4)));
+                class_exists(__NAMESPACE__.str_replace('/', '\\', substr($file, \strlen(__DIR__), -4)));
             }
         }
     }
@@ -130,21 +136,25 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
             $this->configLocator->getConfig(self::EXTRA_KEY)
         );
 
-        if (count($builder->getWarnings()) > 0) {
+        if (\count($builder->getWarnings()) > 0) {
             $this->io->writeError('<error>Invalid config for composer-changelogs plugin:</error>');
             foreach ($builder->getWarnings() as $warning) {
-                $this->io->write('    ' . $warning);
+                $this->io->write('    '.$warning);
             }
         }
     }
 
+    /**
+     * Check the validity of the output file and if the summary is enabled in the configuration.
+     * Call the author of the summary and the webhookCaller.
+     */
     private function handleWriteSummaryFile(): void
     {
         if ($this->fileOutputter->isEmpty()) {
             return;
         }
 
-        if(!$this->config->isWriteSummaryFile()){
+        if (!$this->config->isWriteSummaryFile()) {
             return;
         }
 
@@ -152,12 +162,15 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
         $this->handleWebhookCall();
     }
 
+    /**
+     * Call the webhook url passed in the configuration.
+     */
     private function handleWebhookCall(): void
     {
-        if ($this->config->getWebhookURL() != null) {
-            $output = $this->fileOutputter->getOutput("json");
+        if (null !== $this->config->getWebhookURL()) {
+            $output = $this->fileOutputter->getOutput('json');
 
-            if(strcmp('No changelogs summary', $output) == 0){
+            if (0 === strcmp('No changelogs summary', $output)) {
                 return;
             }
 
@@ -167,28 +180,35 @@ class ChangelogsPlugin implements PluginInterface, EventSubscriberInterface
         }
     }
 
+    /**
+     * Write the summary in the file.
+     */
     private function doWriteSummaryFile(): void
     {
-        $projectRootPath = dirname(\Composer\Factory::getComposerFile());
+        $projectRootPath = \dirname(\Composer\Factory::getComposerFile());
 
         // default changelogs dir path from current composer.json location creating directory named 'changelogs'
-        $changelogsDirPath = $projectRootPath . '/' . Config::CHANGELOGS_DIR;
+        $changelogsDirPath = $projectRootPath.'/'.Config::CHANGELOGS_DIR;
 
         if ($this->config->getChangelogsDirPath()) {
-            $changelogsDirPath = $projectRootPath . '/' . $this->config->getChangelogsDirPath();
+            $changelogsDirPath = $projectRootPath.'/'.$this->config->getChangelogsDirPath();
         }
 
         if (!is_dir($changelogsDirPath) && !file_exists($changelogsDirPath) && !mkdir($changelogsDirPath)) {
-            $this->io->error('The directory ' . $changelogsDirPath . ' was not created. Maybe you specified wrong dir path to extra changelogs-dir-path configuration.');
+            $this->io->error('The directory '.$changelogsDirPath.' was not created. Maybe you specified wrong dir path to extra changelogs-dir-path configuration.');
         }
 
-        $filename = $changelogsDirPath . '/changelogs-' . date('Y-m-d') . '-' . date('H:i') .  $this->getFileExtension();
+        $filename = $changelogsDirPath.'/changelogs-'.date('Y-m-d').'-'.date('H:i').$this->getFileExtension();
 
         if (!file_put_contents($filename, $this->fileOutputter->getOutput($this->config->getOutputFileFormat()))) {
-            $this->io->error('The file ' . $filename . ' was not created. Maybe you specified wrong dir path to extra changelogs-dir-path configuration or you do not have right access to specified directory.');
+            $this->io->error('The file '.$filename.' was not created. Maybe you specified wrong dir path to extra changelogs-dir-path configuration or you do not have right access to specified directory.');
         }
     }
 
+    /**
+     * Return the file extension chosen in the configuration.
+     * By default, the file extension is .txt.
+     */
     private function getFileExtension(): string
     {
         if (FileOutputter::JSON_FORMAT === $this->config->getOutputFileFormat()) {

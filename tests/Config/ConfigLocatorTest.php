@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Spiriit\ComposerWriteChangelogs\tests;
+namespace Spiriit\ComposerWriteChangelogs\tests\Config;
 
 use Composer\Composer;
 use Composer\Config;
@@ -23,15 +23,15 @@ class ConfigLocatorTest extends TestCase
 
     private ?string $globalConfigPath;
 
-    private ConfigLocator $SUT;
+    private ConfigLocator $configLocator;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        $this->localConfigPath = realpath(__DIR__ . '/../fixtures/local') ? realpath(__DIR__ . '/../fixtures/local') : null;
-        $this->globalConfigPath = realpath(__DIR__ . '/../fixtures/home') ? realpath(__DIR__ . '/../fixtures/home') : null;
+        $this->localConfigPath = realpath(__DIR__.'/../fixtures/local') ?: null;
+        $this->globalConfigPath = realpath(__DIR__.'/../fixtures/home') ?: null;
 
         $config = new Config(false, $this->localConfigPath);
         $config->merge([
@@ -51,45 +51,42 @@ class ConfigLocatorTest extends TestCase
         $composer->setConfig($config);
         $composer->setPackage($package);
 
-        $this->SUT = new ConfigLocator($composer);
+        $this->configLocator = new ConfigLocator($composer);
     }
 
     /**
      * @test
      */
-    public function test_it_locates_local_config(): void
+    public function it_locates_local_config(): void
     {
         $key = 'my-local-config';
 
-        $this->assertTrue($this->SUT->locate($key));
-
-        $this->assertSame($this->localConfigPath, $this->SUT->getPath($key));
-        $this->assertSame(['foo' => 'bar'], $this->SUT->getConfig($key));
+        $this->assertTrue($this->configLocator->locate($key));
+        $this->assertSame($this->localConfigPath, $this->configLocator->getPath($key));
+        $this->assertSame(['foo' => 'bar'], $this->configLocator->getConfig($key));
     }
 
     /**
      * @test
      */
-    public function test_it_locates_global_config(): void
+    public function it_locates_global_config(): void
     {
         $key = 'my-global-config';
 
-        $this->assertTrue($this->SUT->locate($key));
-
-        $this->assertSame($this->globalConfigPath, $this->SUT->getPath($key));
-        $this->assertSame(['bar' => 'foo'], $this->SUT->getConfig($key));
+        $this->assertTrue($this->configLocator->locate($key));
+        $this->assertSame($this->globalConfigPath, $this->configLocator->getPath($key));
+        $this->assertSame(['bar' => 'foo'], $this->configLocator->getConfig($key));
     }
 
     /**
      * @test
      */
-    public function test_it_does_not_locate_non_existing_config(): void
+    public function it_does_not_locate_non_existing_config(): void
     {
         $key = 'my-non-existing-config';
 
-        $this->assertFalse($this->SUT->locate($key));
-
-        $this->assertNull($this->SUT->getPath($key));
-        $this->assertSame([], $this->SUT->getConfig($key));
+        $this->assertFalse($this->configLocator->locate($key));
+        $this->assertNull($this->configLocator->getPath($key));
+        $this->assertSame([], $this->configLocator->getConfig($key));
     }
 }

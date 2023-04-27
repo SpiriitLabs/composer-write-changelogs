@@ -13,7 +13,7 @@ namespace Spiriit\ComposerWriteChangelogs\UrlGenerator;
 
 use Spiriit\ComposerWriteChangelogs\Version;
 
-class GitlabUrlGenerator extends AbstractUrlGenerator
+class GitlabUrlGenerator extends GitBasedUrlGenerator
 {
     private string $host;
 
@@ -25,19 +25,11 @@ class GitlabUrlGenerator extends AbstractUrlGenerator
     /**
      * {@inheritdoc}
      */
-    protected function getDomain(): string
-    {
-        return $this->host;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function generateCompareUrl(?string $sourceUrlFrom, Version $versionFrom, ?string $sourceUrlTo, Version $versionTo): ?string
     {
         // Check if both urls come from the supported domain
         // It avoids problems when one url is from another domain or is local
-        if ((!is_null($sourceUrlFrom) && !$this->supports($sourceUrlFrom)) || (!is_null($sourceUrlTo) && !$this->supports($sourceUrlTo))) {
+        if ((null !== $sourceUrlFrom && !$this->supports($sourceUrlFrom)) || (null !== $sourceUrlTo && !$this->supports($sourceUrlTo))) {
             return null;
         }
 
@@ -71,5 +63,13 @@ class GitlabUrlGenerator extends AbstractUrlGenerator
             $this->generateBaseUrl($sourceUrl),
             $version->getPretty()
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDomain(): string
+    {
+        return $this->host;
     }
 }

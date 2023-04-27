@@ -31,7 +31,7 @@ class AbstractUpdateHandler implements OperationHandler
      */
     public function extractSourceUrl(OperationInterface $operation): ?string
     {
-        if (!($operation instanceof UpdateOperation)) {
+        if (!$operation instanceof UpdateOperation) {
             throw new \LogicException('Operation should be an instance of UpdateOperation');
         }
 
@@ -49,8 +49,8 @@ class AbstractUpdateHandler implements OperationHandler
             return '';
         }
 
-        $versionsFrom = \explode('.', $versionFrom);
-        $versionsTo = \explode('.', $versionTo);
+        $versionsFrom = explode('.', $versionFrom);
+        $versionsTo = explode('.', $versionTo);
 
         if (version_compare($versionsFrom[0], $versionsTo[0], '!=')) {
             return $withTags ? ' <fg=red>major</>' : ' major';

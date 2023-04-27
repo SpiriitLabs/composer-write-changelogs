@@ -31,7 +31,7 @@ abstract class AbstractUninstallHandler implements OperationHandler
      */
     public function extractSourceUrl(OperationInterface $operation): ?string
     {
-        if (!($operation instanceof UninstallOperation)) {
+        if (!$operation instanceof UninstallOperation) {
             throw new \LogicException('Operation should be an instance of UninstallOperation');
         }
 

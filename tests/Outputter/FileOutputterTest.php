@@ -58,15 +58,15 @@ class FileOutputterTest extends TestCase
     /**
      * @test
      */
-    public function test_it_adds_operation(): void
+    public function it_adds_operation(): void
     {
         $operation = new InstallOperation(
-            new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0')
+            new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0')
         );
 
         $operation2 = new UpdateOperation(
-            new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0'),
-            new Package('acme/my-project2', 'v1.0.1.0', 'v1.0.1')
+            new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0'),
+            new Package('spiriit/composer-write-changelogs2', 'v1.0.1.0', 'v1.0.1')
         );
 
         $this->fileOutputterText->addOperation($operation);
@@ -75,10 +75,10 @@ class FileOutputterTest extends TestCase
         $expectedOutput = <<<TEXT
 Changelogs summary:
 
- - acme/my-project installed in version v1.0.0
+ - spiriit/composer-write-changelogs installed in version v1.0.0
    Release notes: /release-url2
 
- - acme/my-project1 updated from v1.0.0 to v1.0.1 patch
+ - spiriit/composer-write-changelogs1 updated from v1.0.0 to v1.0.1 patch
    See changes: /compare-url2
    Release notes: /release-url2
 
@@ -91,17 +91,17 @@ TEXT;
     /**
      * @test
      */
-    public function test_it_outputs_with_no_supported_url_generator(): void
+    public function it_outputs_with_no_supported_url_generator(): void
     {
         $this->fileOutputterText = new FileOutputter($this->operationHandlers, []);
 
         $operation = new InstallOperation(
-            new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0')
+            new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0')
         );
 
         $operation2 = new UpdateOperation(
-            new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0'),
-            new Package('acme/my-project2', 'v1.0.1.0', 'v1.0.1')
+            new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0'),
+            new Package('spiriit/composer-write-changelogs2', 'v1.0.1.0', 'v1.0.1')
         );
 
         $this->fileOutputterText->addOperation($operation);
@@ -110,9 +110,9 @@ TEXT;
         $expectedOutput = <<<TEXT
 Changelogs summary:
 
- - acme/my-project installed in version v1.0.0
+ - spiriit/composer-write-changelogs installed in version v1.0.0
 
- - acme/my-project1 updated from v1.0.0 to v1.0.1 patch
+ - spiriit/composer-write-changelogs1 updated from v1.0.0 to v1.0.1 patch
 
 TEXT;
 
@@ -123,17 +123,17 @@ TEXT;
     /**
      * @test
      */
-    public function test_it_outputs_with_no_supported_operation_handler(): void
+    public function it_outputs_with_no_supported_operation_handler(): void
     {
         $this->fileOutputterText = new FileOutputter([], []);
 
         $operation = new InstallOperation(
-            new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0')
+            new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0')
         );
 
         $operation2 = new UpdateOperation(
-            new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0'),
-            new Package('acme/my-project2', 'v1.0.1.0', 'v1.0.1')
+            new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0'),
+            new Package('spiriit/composer-write-changelogs2', 'v1.0.1.0', 'v1.0.1')
         );
 
         $this->fileOutputterText->addOperation($operation);
@@ -151,15 +151,15 @@ TEXT;
     /**
      * @test
      */
-    public function test_it_outputs_right_text(): void
+    public function it_outputs_right_text(): void
     {
         $operation = new InstallOperation(
-            new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0')
+            new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0')
         );
 
         $operation2 = new UpdateOperation(
-            new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0'),
-            new Package('acme/my-project2', 'v1.0.1.0', 'v1.0.1')
+            new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0'),
+            new Package('spiriit/composer-write-changelogs2', 'v1.0.1.0', 'v1.0.1')
         );
 
         $this->fileOutputterText->addOperation($operation);
@@ -168,10 +168,10 @@ TEXT;
         $expectedOutput = <<<TEXT
 Changelogs summary:
 
- - acme/my-project installed in version v1.0.0
+ - spiriit/composer-write-changelogs installed in version v1.0.0
    Release notes: /release-url2
 
- - acme/my-project1 updated from v1.0.0 to v1.0.1 patch
+ - spiriit/composer-write-changelogs1 updated from v1.0.0 to v1.0.1 patch
    See changes: /compare-url2
    Release notes: /release-url2
 
@@ -184,21 +184,21 @@ TEXT;
     /**
      * @test
      */
-    public function test_it_outputs_right_json(): void
+    public function it_outputs_right_json(): void
     {
         $operation = new InstallOperation(
-            new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0')
+            new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0')
         );
 
         $operation2 = new UpdateOperation(
-            new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0'),
-            new Package('acme/my-project2', 'v1.0.1.0', 'v1.0.1')
+            new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0'),
+            new Package('spiriit/composer-write-changelogs2', 'v1.0.1.0', 'v1.0.1')
         );
 
         $this->fileOutputterJSon->addOperation($operation);
         $this->fileOutputterJSon->addOperation($operation2);
 
-        $expectedOutput = '[{"operation":"install","package":"acme/my-project","phrasing":"installed in version","version":"v1.0.0","releaseUrl":"/release-url2"},{"operation":"update","package":"acme/my-project1","action":"updated","phrasing":"updated from","versionFrom":"v1.0.0","versionTo":"v1.0.1","semver":"patch","changesUrl":"/compare-url2","releaseUrl":"/release-url2"}]';
+        $expectedOutput = '[{"operation":"install","package":"spiriit/composer-write-changelogs","phrasing":"installed in version","version":"v1.0.0","releaseUrl":"/release-url2"},{"operation":"update","package":"spiriit/composer-write-changelogs1","action":"updated","phrasing":"updated from","versionFrom":"v1.0.0","versionTo":"v1.0.1","semver":"patch","changesUrl":"/compare-url2","releaseUrl":"/release-url2"}]';
 
         $this->assertFalse($this->fileOutputterJSon->isEmpty());
         $this->assertSame($expectedOutput, $this->fileOutputterJSon->getOutput(FileOutputter::JSON_FORMAT));
@@ -207,7 +207,7 @@ TEXT;
     /**
      * @test
      */
-    public function test_it_outputs_nothing_without_operation(): void
+    public function it_outputs_nothing_without_operation(): void
     {
         $expectedOutput = <<<TEXT
 No changelogs summary

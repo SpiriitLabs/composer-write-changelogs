@@ -23,7 +23,7 @@ class InstallHandler extends AbstractInstallHandler
      */
     public function getOutput(OperationInterface $operation, UrlGenerator $urlGenerator = null): ?array
     {
-        if (!($operation instanceof InstallOperation)) {
+        if (!$operation instanceof InstallOperation) {
             throw new \LogicException('Operation should be an instance of InstallOperation');
         }
 

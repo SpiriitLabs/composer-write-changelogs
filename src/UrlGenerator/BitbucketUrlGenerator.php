@@ -13,16 +13,8 @@ namespace Spiriit\ComposerWriteChangelogs\UrlGenerator;
 
 use Spiriit\ComposerWriteChangelogs\Version;
 
-class BitbucketUrlGenerator extends AbstractUrlGenerator
+class BitbucketUrlGenerator extends GitBasedUrlGenerator
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDomain(): string
-    {
-        return 'bitbucket.org';
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -30,7 +22,7 @@ class BitbucketUrlGenerator extends AbstractUrlGenerator
     {
         // Check if both urls come from the supported domain
         // It avoids problems when one url is from another domain or is local
-        if ((!is_null($sourceUrlFrom) && !$this->supports($sourceUrlFrom)) || (!is_null($sourceUrlTo) && !$this->supports($sourceUrlTo))) {
+        if ((null !== $sourceUrlFrom && !$this->supports($sourceUrlFrom)) || (null !== $sourceUrlTo && !$this->supports($sourceUrlTo))) {
             return null;
         }
 
@@ -67,7 +59,15 @@ class BitbucketUrlGenerator extends AbstractUrlGenerator
      */
     public function generateReleaseUrl(?string $sourceUrl, Version $version): ?string
     {
-        // Releases are not supported on Bitbucket :'(
+        // Releases are not supported on Bitbucket
         return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDomain(): string
+    {
+        return 'bitbucket.org';
     }
 }

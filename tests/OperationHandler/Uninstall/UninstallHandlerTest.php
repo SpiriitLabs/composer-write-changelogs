@@ -13,7 +13,6 @@ namespace Spiriit\ComposerWriteChangelogs\tests\OperationHandler\Uninstall;
 
 use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\Package\Package;
-use LogicException;
 use PHPUnit\Framework\TestCase;
 use Spiriit\ComposerWriteChangelogs\OperationHandler\Uninstall\UninstallHandler;
 use Spiriit\ComposerWriteChangelogs\tests\resources\FakeOperation;
@@ -21,164 +20,163 @@ use Spiriit\ComposerWriteChangelogs\tests\resources\FakeUrlGenerator;
 
 class UninstallHandlerTest extends TestCase
 {
-    /** @var UninstallHandler */
-    private $SUT;
+    private UninstallHandler $uninstallHandler;
 
     protected function setUp(): void
     {
-        $this->SUT = new UninstallHandler();
+        $this->uninstallHandler = new UninstallHandler();
     }
 
     /**
      * @test
      */
-    public function test_it_supports_uninstall_operation(): void
+    public function it_supports_uninstall_operation(): void
     {
         $operation = new UninstallOperation(
-            new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0')
+            new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0')
         );
 
-        $this->assertTrue($this->SUT->supports($operation));
+        $this->assertTrue($this->uninstallHandler->supports($operation));
     }
 
     /**
      * @test
      */
-    public function test_it_does_not_support_non_uninstall_operation(): void
+    public function it_does_not_support_non_uninstall_operation(): void
     {
-        $this->assertFalse($this->SUT->supports(new FakeOperation('')));
+        $this->assertFalse($this->uninstallHandler->supports(new FakeOperation('')));
     }
 
     /**
      * @test
      */
-    public function test_it_extracts_source_url(): void
+    public function it_extracts_source_url(): void
     {
-        $package = new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0');
-        $package->setSourceUrl('https://example.com/acme/my-project.git');
+        $package = new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0');
+        $package->setSourceUrl('https://example.com/spiriit/composer-write-changelogs.git');
 
         $operation = new UninstallOperation($package);
 
         $this->assertSame(
-            'https://example.com/acme/my-project.git',
-            $this->SUT->extractSourceUrl($operation)
+            'https://example.com/spiriit/composer-write-changelogs.git',
+            $this->uninstallHandler->extractSourceUrl($operation)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_throws_exception_when_extracting_source_url_from_non_uninstall_operation(): void
+    public function it_throws_exception_when_extracting_source_url_from_non_uninstall_operation(): void
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Operation should be an instance of UninstallOperation');
 
-        $this->SUT->extractSourceUrl(new FakeOperation(''));
+        $this->uninstallHandler->extractSourceUrl(new FakeOperation(''));
     }
 
     /**
      * @test
      */
-    public function test_it_gets_output_without_url_generator(): void
+    public function it_gets_output_without_url_generator(): void
     {
-        $package = new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0');
-        $package->setSourceUrl('https://example.com/acme/my-project.git');
+        $package = new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0');
+        $package->setSourceUrl('https://example.com/spiriit/composer-write-changelogs.git');
 
         $operation = new UninstallOperation($package);
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project</fg=green> removed (installed version was <fg=yellow>v1.0.0</fg=yellow>)',
+            ' - <fg=green>spiriit/composer-write-changelogs</fg=green> removed (installed version was <fg=yellow>v1.0.0</fg=yellow>)',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($operation, null)
+            $this->uninstallHandler->getOutput($operation, null)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_gets_output_with_url_generator_no_supporting_compare_url(): void
+    public function it_gets_output_with_url_generator_no_supporting_compare_url(): void
     {
         $operation = new UninstallOperation(
-            new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0')
+            new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0')
         );
 
         $urlGenerator = new FakeUrlGenerator(
             true,
             null,
-            'https://example.com/acme/my-project/release/v1.0.1'
+            'https://example.com/spiriit/composer-write-changelogs/release/v1.0.1'
         );
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project</fg=green> removed (installed version was <fg=yellow>v1.0.0</fg=yellow>)',
+            ' - <fg=green>spiriit/composer-write-changelogs</fg=green> removed (installed version was <fg=yellow>v1.0.0</fg=yellow>)',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($operation, $urlGenerator)
+            $this->uninstallHandler->getOutput($operation, $urlGenerator)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_gets_output_with_url_generator_no_supporting_release_url(): void
+    public function it_gets_output_with_url_generator_no_supporting_release_url(): void
     {
         $operation = new UninstallOperation(
-            new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0')
+            new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0')
         );
 
         $urlGenerator = new FakeUrlGenerator(
             true,
-            'https://example.com/acme/my-project/compare/v1.0.0/v1.0.1',
-            'https://example.com/acme/my-project/release/v1.0.1'
+            'https://example.com/spiriit/composer-write-changelogs/compare/v1.0.0/v1.0.1',
+            'https://example.com/spiriit/composer-write-changelogs/release/v1.0.1'
         );
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project</fg=green> removed (installed version was <fg=yellow>v1.0.0</fg=yellow>)',
+            ' - <fg=green>spiriit/composer-write-changelogs</fg=green> removed (installed version was <fg=yellow>v1.0.0</fg=yellow>)',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($operation, $urlGenerator)
+            $this->uninstallHandler->getOutput($operation, $urlGenerator)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_gets_output_with_url_generator_supporting_all_urls(): void
+    public function it_gets_output_with_url_generator_supporting_all_urls(): void
     {
         $operation = new UninstallOperation(
-            new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0')
+            new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0')
         );
 
         $urlGenerator = new FakeUrlGenerator(
             true,
-            'https://example.com/acme/my-project/compare/v1.0.0/v1.0.1',
-            'https://example.com/acme/my-project/release/v1.0.1'
+            'https://example.com/spiriit/composer-write-changelogs/compare/v1.0.0/v1.0.1',
+            'https://example.com/spiriit/composer-write-changelogs/release/v1.0.1'
         );
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project</fg=green> removed (installed version was <fg=yellow>v1.0.0</fg=yellow>)',
+            ' - <fg=green>spiriit/composer-write-changelogs</fg=green> removed (installed version was <fg=yellow>v1.0.0</fg=yellow>)',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($operation, $urlGenerator)
+            $this->uninstallHandler->getOutput($operation, $urlGenerator)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_throws_exception_when_getting_output_from_non_uninstall_operation(): void
+    public function it_throws_exception_when_getting_output_from_non_uninstall_operation(): void
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Operation should be an instance of UninstallOperation');
 
-        $this->SUT->getOutput(new FakeOperation(''));
+        $this->uninstallHandler->getOutput(new FakeOperation(''));
     }
 }

@@ -22,6 +22,11 @@ class FakeOperation implements OperationInterface
         $this->text = $text;
     }
 
+    public function __toString(): string
+    {
+        return '';
+    }
+
     public function getOperationType(): string
     {
         return '';
@@ -43,11 +48,6 @@ class FakeOperation implements OperationInterface
     }
 
     public function show($lock): string
-    {
-        return '';
-    }
-
-    public function __toString(): string
     {
         return '';
     }

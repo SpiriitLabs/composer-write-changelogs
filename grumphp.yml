@@ -1,0 +1,8 @@
+grumphp:
+    git_hook_variables:
+        EXEC_GRUMPHP_COMMAND: symfony php
+    tasks:
+        phpstan:
+            use_grumphp_paths: false
+        phpcsfixer: ~
+        phpunit: ~

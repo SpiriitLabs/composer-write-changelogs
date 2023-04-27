@@ -18,18 +18,15 @@ abstract class GitBasedUrlGenerator implements UrlGenerator
     public const REGEX_USER = '(?P<user>[^/]+)';
     public const REGEX_REPOSITORY = '(?P<repository>[^/]+)';
 
+    public function supports(?string $sourceUrl): bool
+    {
+        return false !== strpos($sourceUrl ?? '', $this->getDomain());
+    }
+
     /**
      * Returns the domain of the service, like "example.org".
      */
     abstract protected function getDomain(): string;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(string $sourceUrl): bool
-    {
-        return false !== strpos($sourceUrl, $this->getDomain());
-    }
 
     /**
      * Generates the canonical http url for a repository.
@@ -39,19 +36,20 @@ abstract class GitBasedUrlGenerator implements UrlGenerator
      */
     protected function generateBaseUrl(?string $sourceUrl): string
     {
-        if($sourceUrl != null){
+        if (null !== $sourceUrl) {
             if ($this->isSshUrl($sourceUrl)) {
                 return $this->transformSshUrlIntoHttp($sourceUrl);
             }
 
             $sourceUrl = parse_url($sourceUrl);
 
-            if(is_array($sourceUrl) && isset($sourceUrl['path']) && isset($sourceUrl['scheme']) && isset($sourceUrl['host'])){
+            if (\is_array($sourceUrl) && isset($sourceUrl['path'], $sourceUrl['scheme'], $sourceUrl['host'])) {
                 $pos = strrpos($sourceUrl['path'], '.git');
                 $length = strrpos($sourceUrl['path'], '.git');
 
-                if(!$length)
+                if (!$length) {
                     $length = null;
+                }
 
                 return sprintf(
                     '%s://%s%s',
@@ -59,13 +57,12 @@ abstract class GitBasedUrlGenerator implements UrlGenerator
                     $sourceUrl['host'],
                     false === $pos ? $sourceUrl['path'] : substr($sourceUrl['path'], 0, $length)
                 );
-            } 
-                return "";
-            
+            }
 
-        } 
-            return "";
-        
+            return '';
+        }
+
+        return '';
     }
 
     /**
@@ -78,7 +75,7 @@ abstract class GitBasedUrlGenerator implements UrlGenerator
         if ($version->isDev()) {
             return substr(
                 $version->getFullPretty(),
-                strlen($version->getPretty()) + 1
+                \strlen($version->getPretty()) + 1
             );
         }
 
@@ -90,14 +87,12 @@ abstract class GitBasedUrlGenerator implements UrlGenerator
      */
     protected function extractRepositoryInformation(string $sourceUrl): array
     {
-        $pattern = '#' . $this->getDomain() . '/' . self::REGEX_USER . '/' . self::REGEX_REPOSITORY . '#';
+        $pattern = '#'.$this->getDomain().'/'.self::REGEX_USER.'/'.self::REGEX_REPOSITORY.'#';
 
         preg_match($pattern, $sourceUrl, $matches);
 
         if (!isset($matches['user']) || !isset($matches['repository'])) {
-            throw new \LogicException(
-                sprintf('Unrecognized url format for %s ("%s")', $this->getDomain(), $sourceUrl)
-            );
+            throw new \LogicException(sprintf('Unrecognized url format for %s ("%s")', $this->getDomain(), $sourceUrl));
         }
 
         return [
@@ -107,7 +102,7 @@ abstract class GitBasedUrlGenerator implements UrlGenerator
     }
 
     /**
-     * Returns whether an url uses a ssh git protocol.
+     * Returns whether an url uses ssh git protocol.
      */
     private function isSshUrl(string $url): bool
     {
@@ -119,7 +114,7 @@ abstract class GitBasedUrlGenerator implements UrlGenerator
      */
     private function transformSshUrlIntoHttp(string $url): string
     {
-        $pattern = '#git@' . $this->getDomain() . ':' . self::REGEX_USER . '/' . self::REGEX_REPOSITORY . '.git$#';
+        $pattern = '#git@'.$this->getDomain().':'.self::REGEX_USER.'/'.self::REGEX_REPOSITORY.'.git$#';
 
         if (preg_match($pattern, $url, $matches)) {
             return sprintf(

@@ -32,7 +32,7 @@ class UpdateHandler extends AbstractUpdateHandler
      */
     public function extractSourceUrl(OperationInterface $operation): ?string
     {
-        if (!($operation instanceof UpdateOperation)) {
+        if (!$operation instanceof UpdateOperation) {
             throw new \LogicException('Operation should be an instance of UpdateOperation');
         }
 
@@ -44,7 +44,7 @@ class UpdateHandler extends AbstractUpdateHandler
      */
     public function getOutput(OperationInterface $operation, UrlGenerator $urlGenerator = null): array
     {
-        if (!($operation instanceof UpdateOperation)) {
+        if (!$operation instanceof UpdateOperation) {
             throw new \LogicException('Operation should be an instance of UpdateOperation');
         }
 

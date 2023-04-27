@@ -42,7 +42,7 @@ class Version
     }
 
     /**
-     * Return whether the version is dev or not.
+     * Return whether the version is in dev or not.
      */
     public function isDev(): bool
     {
@@ -50,7 +50,7 @@ class Version
     }
 
     /**
-     * Return the version string for CLI Output
+     * Return the version string for CLI Output.
      * In case of dev version it adds the vcs hash.
      */
     public function getCliOutput(): string
@@ -59,10 +59,10 @@ class Version
         if ($this->isDev()) {
             $hash = substr(
                 $this->getFullPretty(),
-                strlen($this->getPretty()) + 1
+                \strlen($this->getPretty()) + 1
             );
             if ($hash) {
-                $cliOutput .= '@' . $hash;
+                $cliOutput .= '@'.$hash;
             }
         }
 

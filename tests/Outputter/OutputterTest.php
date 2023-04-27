@@ -19,7 +19,7 @@ use Spiriit\ComposerWriteChangelogs\tests\resources\FakeUrlGenerator;
 
 class OutputterTest extends TestCase
 {
-    private Outputter $SUT;
+    private Outputter $outputter;
 
     private array $operationHandlers;
 
@@ -39,48 +39,49 @@ class OutputterTest extends TestCase
             new FakeUrlGenerator(true, '/compare-url3', '/release-url3'),
         ];
 
-        $this->SUT = new Outputter($this->operationHandlers, $this->urlGenerators);
+        $this->outputter = new Outputter($this->operationHandlers, $this->urlGenerators);
     }
 
     /**
      * @test
      */
-    public function test_it_adds_operation(): void
+    public function it_adds_operation(): void
     {
         $operation1 = new FakeOperation('');
-        $this->SUT->addOperation($operation1);
+        $this->outputter->addOperation($operation1);
 
         $operation2 = new FakeOperation('');
-        $this->SUT->addOperation($operation2);
+        $this->outputter->addOperation($operation2);
 
+        $expectedOperation = 'Output handler 2, ';
         $expectedOutput = <<<TEXT
 <fg=green>Changelogs summary:</fg=green>
 
- - Output handler 2, 
+ - {$expectedOperation}
    /compare-url2
    /release-url2
 
- - Output handler 2, 
+ - {$expectedOperation}
    /compare-url2
    /release-url2
 
 TEXT;
 
-        $this->assertFalse($this->SUT->isEmpty());
-        $this->assertSame($expectedOutput, $this->SUT->getOutput());
+        $this->assertFalse($this->outputter->isEmpty());
+        $this->assertSame($expectedOutput, $this->outputter->getOutput());
     }
 
     /**
      * @test
      */
-    public function test_it_outputs_with_no_supported_url_generator(): void
+    public function it_outputs_with_no_supported_url_generator(): void
     {
-        $this->SUT = new Outputter($this->operationHandlers, [
+        $this->outputter = new Outputter($this->operationHandlers, [
             new FakeUrlGenerator(false, '', ''),
         ]);
 
-        $this->SUT->addOperation(new FakeOperation('operation 1'));
-        $this->SUT->addOperation(new FakeOperation('operation 2'));
+        $this->outputter->addOperation(new FakeOperation('operation 1'));
+        $this->outputter->addOperation(new FakeOperation('operation 2'));
 
         $expectedOutput = <<<TEXT
 <fg=green>Changelogs summary:</fg=green>
@@ -91,29 +92,29 @@ TEXT;
 
 TEXT;
 
-        $this->assertFalse($this->SUT->isEmpty());
-        $this->assertSame($expectedOutput, $this->SUT->getOutput());
+        $this->assertFalse($this->outputter->isEmpty());
+        $this->assertSame($expectedOutput, $this->outputter->getOutput());
     }
 
     /**
      * @test
      */
-    public function test_it_outputs_with_no_supported_operation_handler(): void
+    public function it_outputs_with_no_supported_operation_handler(): void
     {
-        $this->SUT = new Outputter([
+        $this->outputter = new Outputter([
             new FakeHandler(false, '', ''),
         ], $this->urlGenerators);
 
-        $this->SUT->addOperation(new FakeOperation('operation 1'));
-        $this->SUT->addOperation(new FakeOperation('operation 2'));
+        $this->outputter->addOperation(new FakeOperation('operation 1'));
+        $this->outputter->addOperation(new FakeOperation('operation 2'));
 
         $expectedOutput = <<<TEXT
 <fg=green>Changelogs summary:</fg=green>
 
 TEXT;
 
-        $this->assertFalse($this->SUT->isEmpty());
-        $this->assertSame($expectedOutput, $this->SUT->getOutput());
+        $this->assertFalse($this->outputter->isEmpty());
+        $this->assertSame($expectedOutput, $this->outputter->getOutput());
     }
 
     /**
@@ -121,8 +122,8 @@ TEXT;
      */
     public function it_outputs_right_text(): void
     {
-        $this->SUT->addOperation(new FakeOperation('operation 1'));
-        $this->SUT->addOperation(new FakeOperation('operation 2'));
+        $this->outputter->addOperation(new FakeOperation('operation 1'));
+        $this->outputter->addOperation(new FakeOperation('operation 2'));
 
         $expectedOutput = <<<TEXT
 <fg=green>Changelogs summary:</fg=green>
@@ -137,8 +138,8 @@ TEXT;
 
 TEXT;
 
-        $this->assertFalse($this->SUT->isEmpty());
-        $this->assertSame($expectedOutput, $this->SUT->getOutput());
+        $this->assertFalse($this->outputter->isEmpty());
+        $this->assertSame($expectedOutput, $this->outputter->getOutput());
     }
 
     /**
@@ -150,7 +151,7 @@ TEXT;
 <fg=green>No changelogs summary</fg=green>
 TEXT;
 
-        $this->assertTrue($this->SUT->isEmpty());
-        $this->assertSame($expectedOutput, $this->SUT->getOutput());
+        $this->assertTrue($this->outputter->isEmpty());
+        $this->assertSame($expectedOutput, $this->outputter->getOutput());
     }
 }

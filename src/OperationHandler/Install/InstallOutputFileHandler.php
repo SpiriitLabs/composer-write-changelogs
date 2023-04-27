@@ -32,7 +32,7 @@ class InstallOutputFileHandler extends AbstractInstallHandler
      */
     public function getOutput(OperationInterface $operation, UrlGenerator $urlGenerator = null): ?array
     {
-        if (!($operation instanceof InstallOperation)) {
+        if (!$operation instanceof InstallOperation) {
             throw new \LogicException('Operation should be an instance of InstallOperation');
         }
 
@@ -47,9 +47,9 @@ class InstallOutputFileHandler extends AbstractInstallHandler
 
         if (FileOutputter::JSON_FORMAT === $this->outputFormat) {
             return $this->getJsonOutput($package, $version, $urlGenerator);
-        }  
-            return $this->getTextOutput($package, $version, $urlGenerator);
-        
+        }
+
+        return $this->getTextOutput($package, $version, $urlGenerator);
     }
 
     private function getTextOutput(PackageInterface $package, Version $version, UrlGenerator $urlGenerator = null): array

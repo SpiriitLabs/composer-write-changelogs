@@ -49,16 +49,11 @@ class Config
         return $this->outputFileFormat;
     }
 
-    /**
-     */
     public function isWriteSummaryFile(): bool
     {
         return $this->writeSummaryFile;
     }
 
-    /**
-     * @return string
-     */
     public function getWebhookURL(): ?string
     {
         return $this->webhookURL;

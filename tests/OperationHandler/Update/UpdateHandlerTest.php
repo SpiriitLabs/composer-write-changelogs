@@ -13,7 +13,6 @@ namespace Spiriit\ComposerWriteChangelogs\tests\OperationHandler\Update;
 
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\Package\Package;
-use LogicException;
 use PHPUnit\Framework\TestCase;
 use Spiriit\ComposerWriteChangelogs\OperationHandler\Update\UpdateHandler;
 use Spiriit\ComposerWriteChangelogs\tests\resources\FakeOperation;
@@ -21,279 +20,277 @@ use Spiriit\ComposerWriteChangelogs\tests\resources\FakeUrlGenerator;
 
 class UpdateHandlerTest extends TestCase
 {
-    /** @var UpdateHandler */
-    private $SUT;
+    private UpdateHandler $updateHandler;
 
     protected function setUp(): void
     {
-        $this->SUT = new UpdateHandler();
+        $this->updateHandler = new UpdateHandler();
     }
 
     /**
      * @test
      */
-    public function test_it_supports_update_operation(): void
+    public function it_supports_update_operation(): void
     {
         $operation = new UpdateOperation(
-            new Package('acme/my-project', 'v1.0.0.0', 'v1.0.0'),
-            new Package('acme/my-project', 'v1.0.1.0', 'v1.0.1')
+            new Package('spiriit/composer-write-changelogs', 'v1.0.0.0', 'v1.0.0'),
+            new Package('spiriit/composer-write-changelogs', 'v1.0.1.0', 'v1.0.1')
         );
 
-        $this->assertTrue($this->SUT->supports($operation));
+        $this->assertTrue($this->updateHandler->supports($operation));
     }
 
     /**
      * @test
      */
-    public function test_it_does_not_support_non_update_operation(): void
+    public function it_does_not_support_non_update_operation(): void
     {
-        $this->assertFalse($this->SUT->supports(new FakeOperation('')));
+        $this->assertFalse($this->updateHandler->supports(new FakeOperation('')));
     }
 
     /**
      * @test
      */
-    public function test_it_extracts_source_url(): void
+    public function it_extracts_source_url(): void
     {
-        $package1 = new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0');
-        $package1->setSourceUrl('https://example.com/acme/my-project1.git');
+        $package1 = new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0');
+        $package1->setSourceUrl('https://example.com/spiriit/composer-write-changelogs1.git');
 
-        $package2 = new Package('acme/my-project2', 'v1.0.1.0', 'v1.0.1');
-        $package2->setSourceUrl('https://example.com/acme/my-project2.git');
+        $package2 = new Package('spiriit/composer-write-changelogs2', 'v1.0.1.0', 'v1.0.1');
+        $package2->setSourceUrl('https://example.com/spiriit/composer-write-changelogs2.git');
 
         $operation = new UpdateOperation($package1, $package2);
 
         $this->assertSame(
-            'https://example.com/acme/my-project2.git',
-            $this->SUT->extractSourceUrl($operation)
+            'https://example.com/spiriit/composer-write-changelogs2.git',
+            $this->updateHandler->extractSourceUrl($operation)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_throws_exception_when_extracting_source_url_from_non_update_operation(): void
+    public function it_throws_exception_when_extracting_source_url_from_non_update_operation(): void
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Operation should be an instance of UpdateOperation');
 
-        $this->SUT->extractSourceUrl(new FakeOperation(''));
+        $this->updateHandler->extractSourceUrl(new FakeOperation(''));
     }
 
     /**
      * @test
      */
-    public function test_it_gets_output_without_url_generator(): void
+    public function it_gets_output_without_url_generator(): void
     {
-        $package1 = new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0');
-        $package1->setSourceUrl('https://example.com/acme/my-project1.git');
+        $package1 = new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0');
+        $package1->setSourceUrl('https://example.com/spiriit/composer-write-changelogs1.git');
 
-        $package2 = new Package('acme/my-project2', 'v1.1.1.0', 'v1.1.1');
-        $package2->setSourceUrl('https://example.com/acme/my-project2.git');
+        $package2 = new Package('spiriit/composer-write-changelogs2', 'v1.1.1.0', 'v1.1.1');
+        $package2->setSourceUrl('https://example.com/spiriit/composer-write-changelogs2.git');
 
         $operation = new UpdateOperation($package1, $package2);
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.1.1</fg=yellow> <fg=magenta>minor</>',
+            ' - <fg=green>spiriit/composer-write-changelogs1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.1.1</fg=yellow> <fg=magenta>minor</>',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($operation, null)
+            $this->updateHandler->getOutput($operation, null)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_gets_output_with_url_generator_no_supporting_compare_url(): void
+    public function it_gets_output_with_url_generator_no_supporting_compare_url(): void
     {
         $operation = new UpdateOperation(
-            new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0'),
-            new Package('acme/my-project2', 'v1.0.1.0', 'v1.0.1')
+            new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0'),
+            new Package('spiriit/composer-write-changelogs2', 'v1.0.1.0', 'v1.0.1')
         );
 
         $urlGenerator = new FakeUrlGenerator(
             true,
             null,
-            'https://example.com/acme/my-project/release/v1.0.1'
+            'https://example.com/spiriit/composer-write-changelogs/release/v1.0.1'
         );
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.0.1</fg=yellow> <fg=cyan>patch</>',
-            '   Release notes: https://example.com/acme/my-project/release/v1.0.1',
+            ' - <fg=green>spiriit/composer-write-changelogs1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.0.1</fg=yellow> <fg=cyan>patch</>',
+            '   Release notes: https://example.com/spiriit/composer-write-changelogs/release/v1.0.1',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($operation, $urlGenerator)
+            $this->updateHandler->getOutput($operation, $urlGenerator)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_gets_output_with_url_generator_no_supporting_release_url(): void
+    public function it_gets_output_with_url_generator_no_supporting_release_url(): void
     {
         $operation = new UpdateOperation(
-            new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0'),
-            new Package('acme/my-project2', 'v1.0.1.0', 'v1.0.1')
+            new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0'),
+            new Package('spiriit/composer-write-changelogs2', 'v1.0.1.0', 'v1.0.1')
         );
 
         $urlGenerator = new FakeUrlGenerator(
             true,
-            'https://example.com/acme/my-project/compare/v1.0.0/v1.0.1',
-
-            'https://example.com/acme/my-project/release/v1.0.1'
+            'https://example.com/spiriit/composer-write-changelogs/compare/v1.0.0/v1.0.1',
+            'https://example.com/spiriit/composer-write-changelogs/release/v1.0.1'
         );
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.0.1</fg=yellow> <fg=cyan>patch</>',
-            '   See changes: https://example.com/acme/my-project/compare/v1.0.0/v1.0.1',
-            '   Release notes: https://example.com/acme/my-project/release/v1.0.1',
+            ' - <fg=green>spiriit/composer-write-changelogs1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.0.1</fg=yellow> <fg=cyan>patch</>',
+            '   See changes: https://example.com/spiriit/composer-write-changelogs/compare/v1.0.0/v1.0.1',
+            '   Release notes: https://example.com/spiriit/composer-write-changelogs/release/v1.0.1',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($operation, $urlGenerator)
+            $this->updateHandler->getOutput($operation, $urlGenerator)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_gets_output_with_url_generator_supporting_all_urls(): void
+    public function it_gets_output_with_url_generator_supporting_all_urls(): void
     {
         $operation = new UpdateOperation(
-            new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0'),
-            new Package('acme/my-project2', 'v1.0.1.0', 'v1.0.1')
+            new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0'),
+            new Package('spiriit/composer-write-changelogs2', 'v1.0.1.0', 'v1.0.1')
         );
 
         $urlGenerator = new FakeUrlGenerator(
             true,
-            'https://example.com/acme/my-project/compare/v1.0.0/v1.0.1',
-            'https://example.com/acme/my-project/release/v1.0.1'
+            'https://example.com/spiriit/composer-write-changelogs/compare/v1.0.0/v1.0.1',
+            'https://example.com/spiriit/composer-write-changelogs/release/v1.0.1'
         );
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.0.1</fg=yellow> <fg=cyan>patch</>',
-            '   See changes: https://example.com/acme/my-project/compare/v1.0.0/v1.0.1',
-            '   Release notes: https://example.com/acme/my-project/release/v1.0.1',
+            ' - <fg=green>spiriit/composer-write-changelogs1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.0.1</fg=yellow> <fg=cyan>patch</>',
+            '   See changes: https://example.com/spiriit/composer-write-changelogs/compare/v1.0.0/v1.0.1',
+            '   Release notes: https://example.com/spiriit/composer-write-changelogs/release/v1.0.1',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($operation, $urlGenerator)
+            $this->updateHandler->getOutput($operation, $urlGenerator)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_throws_exception_when_getting_output_from_non_update_operation(): void
+    public function it_throws_exception_when_getting_output_from_non_update_operation(): void
     {
-        $this->expectException(LogicException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Operation should be an instance of UpdateOperation');
 
-        $this->SUT->getOutput(new FakeOperation(''));
+        $this->updateHandler->getOutput(new FakeOperation(''));
     }
 
     /**
      * @test
      */
-    public function test_it_uses_correct_action_name(): void
+    public function it_uses_correct_action_name(): void
     {
-        $package1 = new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0');
-        $package2 = new Package('acme/my-project2', 'v1.0.1.0', 'v1.0.1');
+        $package1 = new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0');
+        $package2 = new Package('spiriit/composer-write-changelogs2', 'v1.0.1.0', 'v1.0.1');
 
         $operationUpdate = new UpdateOperation($package1, $package2);
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.0.1</fg=yellow> <fg=cyan>patch</>',
+            ' - <fg=green>spiriit/composer-write-changelogs1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.0.1</fg=yellow> <fg=cyan>patch</>',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($operationUpdate, null)
+            $this->updateHandler->getOutput($operationUpdate, null)
         );
 
         $operationDowngrade = new UpdateOperation($package2, $package1);
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project2</fg=green> downgraded from <fg=yellow>v1.0.1</fg=yellow> to <fg=yellow>v1.0.0</fg=yellow> <fg=cyan>patch</>',
+            ' - <fg=green>spiriit/composer-write-changelogs2</fg=green> downgraded from <fg=yellow>v1.0.1</fg=yellow> to <fg=yellow>v1.0.0</fg=yellow> <fg=cyan>patch</>',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($operationDowngrade, null)
+            $this->updateHandler->getOutput($operationDowngrade, null)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_outputs_the_correct_semver_colors(): void
+    public function it_outputs_the_correct_semver_colors(): void
     {
-        $base = new Package('acme/my-project1', 'v1.0.0.0', 'v1.0.0');
-        $patch = new Package('acme/my-project1', 'v1.0.1.0', 'v1.0.1');
-        $minor = new Package('acme/my-project2', 'v1.1.0.0', 'v1.1.0');
-        $major = new Package('acme/my-project2', 'v2.0.0.0', 'v2.0.0');
+        $base = new Package('spiriit/composer-write-changelogs1', 'v1.0.0.0', 'v1.0.0');
+        $patch = new Package('spiriit/composer-write-changelogs1', 'v1.0.1.0', 'v1.0.1');
+        $minor = new Package('spiriit/composer-write-changelogs2', 'v1.1.0.0', 'v1.1.0');
+        $major = new Package('spiriit/composer-write-changelogs2', 'v2.0.0.0', 'v2.0.0');
 
         $patchUpdate = new UpdateOperation($base, $patch);
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.0.1</fg=yellow> <fg=cyan>patch</>',
+            ' - <fg=green>spiriit/composer-write-changelogs1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.0.1</fg=yellow> <fg=cyan>patch</>',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($patchUpdate, null)
+            $this->updateHandler->getOutput($patchUpdate, null)
         );
 
         $minorUpdate = new UpdateOperation($base, $minor);
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.1.0</fg=yellow> <fg=magenta>minor</>',
+            ' - <fg=green>spiriit/composer-write-changelogs1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v1.1.0</fg=yellow> <fg=magenta>minor</>',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($minorUpdate, null)
+            $this->updateHandler->getOutput($minorUpdate, null)
         );
 
         $majorUpdate = new UpdateOperation($base, $major);
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v2.0.0</fg=yellow> <fg=red>major</>',
+            ' - <fg=green>spiriit/composer-write-changelogs1</fg=green> updated from <fg=yellow>v1.0.0</fg=yellow> to <fg=yellow>v2.0.0</fg=yellow> <fg=red>major</>',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($majorUpdate, null)
+            $this->updateHandler->getOutput($majorUpdate, null)
         );
     }
 
     /**
      * @test
      */
-    public function test_it_displays_vcs_revision_for_dev_package(): void
+    public function it_displays_vcs_revision_for_dev_package(): void
     {
-        $package1 = new Package('acme/my-project1', 'dev-master', 'dev-master');
+        $package1 = new Package('spiriit/composer-write-changelogs1', 'dev-master', 'dev-master');
         $package1->setSourceType('git');
         $package1->setSourceReference('958a5dd');
-        $package2 = new Package('acme/my-project2', 'dev-master', 'dev-master');
+        $package2 = new Package('spiriit/composer-write-changelogs2', 'dev-master', 'dev-master');
         $package2->setSourceType('git');
         $package2->setSourceReference('6d57476');
 
         $operationUpdate = new UpdateOperation($package1, $package2);
 
         $expectedOutput = [
-            ' - <fg=green>acme/my-project1</fg=green> updated from <fg=yellow>dev-master@958a5dd</fg=yellow> to <fg=yellow>dev-master@6d57476</fg=yellow>',
+            ' - <fg=green>spiriit/composer-write-changelogs1</fg=green> updated from <fg=yellow>dev-master@958a5dd</fg=yellow> to <fg=yellow>dev-master@6d57476</fg=yellow>',
         ];
 
         $this->assertSame(
             $expectedOutput,
-            $this->SUT->getOutput($operationUpdate, null)
+            $this->updateHandler->getOutput($operationUpdate, null)
         );
     }
 }

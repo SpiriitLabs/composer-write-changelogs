@@ -12,7 +12,6 @@
 namespace Spiriit\ComposerWriteChangelogs\Outputter;
 
 use Composer\DependencyResolver\Operation\OperationInterface;
-use Exception;
 
 class FileOutputter extends AbstractOutputter
 {
@@ -21,7 +20,7 @@ class FileOutputter extends AbstractOutputter
     public const JSON_FORMAT = 'json';
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function getOutput(string $outputFormat): string
     {
@@ -35,17 +34,16 @@ class FileOutputter extends AbstractOutputter
             if (self::JSON_FORMAT === $outputFormat) {
                 $output = $this->handleJsonOutput($output);
                 if (!$output = json_encode($output, JSON_UNESCAPED_SLASHES)) {
-                    throw new Exception('The output could not be formatted.');
+                    throw new \Exception('The output could not be formatted.');
                 }
 
                 return $output;
-            }  
-                $output[] = 'Changelogs summary:';
-                foreach ($this->operations as $operation) {
-                    $this->createOperationOutput($output, $operation);
-                }
-                $output[] = '';
-            
+            }
+            $output[] = 'Changelogs summary:';
+            foreach ($this->operations as $operation) {
+                $this->createOperationOutput($output, $operation);
+            }
+            $output[] = '';
         }
 
         return implode("\n", $output);

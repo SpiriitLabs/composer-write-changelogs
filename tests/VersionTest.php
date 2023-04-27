@@ -16,45 +16,48 @@ use Spiriit\ComposerWriteChangelogs\Version;
 
 class VersionTest extends TestCase
 {
-    private Version $SUT;
+    private Version $version;
 
-    /**
-     * @test
-     *
-     * @return void
-     */
-    public function test_it_keep_version_formats()
+    public static function keepVersionFormatsProvider(): \Generator
     {
-        $this->SUT = new Version('v1.0.0.0', 'v1.0.0', 'v1.0.0');
+        yield 'all sames' => ['V1.0.0.0', 'V1.0.0', 'V1.0.0'];
 
-        $this->assertSame('v1.0.0.0', $this->SUT->getName());
-        $this->assertSame('v1.0.0', $this->SUT->getPretty());
-        $this->assertSame('v1.0.0', $this->SUT->getFullPretty());
-
-        $this->SUT = new Version('v.1.0.9999999.9999999-dev', 'dev-master', 'dev-master 1234abc');
-
-        $this->assertSame('v.1.0.9999999.9999999-dev', $this->SUT->getName());
-        $this->assertSame('dev-master', $this->SUT->getPretty());
-        $this->assertSame('dev-master 1234abc', $this->SUT->getFullPretty());
+        yield 'normal uses' => ['v.1.0.9999999.9999999-dev', 'dev-master', 'dev-master 1234abc'];
     }
 
     /**
-     * @test
+     * @dataProvider keepVersionFormatsProvider
      *
-     * @return void
+     * @test
      */
-    public function test_it_detects_dev_version()
+    public function it_keep_version_formats(string $name, string $pretty, string $fullPretty): void
     {
-        $this->SUT = new Version('v1.0.0.0', 'v1.0.0', 'v1.0.0');
+        $this->version = new Version($name, $pretty, $fullPretty);
+        $this->assertSame($name, $this->version->getName());
+        $this->assertSame($pretty, $this->version->getPretty());
+        $this->assertSame($fullPretty, $this->version->getFullPretty());
+    }
 
-        $this->assertFalse($this->SUT->isDev());
+    /**
+     * Data provider of 'test_it_detects_dev_version' test.
+     */
+    public static function detectsDevVersionProvider(): \Generator
+    {
+        yield 'all sames' => ['v1.0.0.0', 'v1.0.0.0', 'v1.0.0.0', false];
 
-        $this->SUT = new Version('v.1.0.9999999.9999999-dev', 'dev-master', 'dev-master 1234abc');
+        yield 'abused' => ['v.1.0.9999999.9999999-dev', 'dev-master', 'dev-master 1234abc', true];
 
-        $this->assertTrue($this->SUT->isDev());
+        yield 'normal uses' => ['dev-fix/issue', 'dev-fix/issue', 'dev-fix/issue 1234abc', true];
+    }
 
-        $this->SUT = new Version('dev-fix/issue', 'dev-fix/issue', 'dev-fix/issue 1234abc');
-
-        $this->assertTrue($this->SUT->isDev());
+    /**
+     * @dataProvider detectsDevVersionProvider
+     *
+     * @test
+     */
+    public function it_detects_dev_version(string $name, string $pretty, string $fullPretty, bool $isDev): void
+    {
+        $this->version = new Version($name, $pretty, $fullPretty);
+        $this->assertSame($isDev, $this->version->isDev());
     }
 }

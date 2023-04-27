@@ -15,9 +15,8 @@ use Composer\Composer;
 
 class ConfigLocator
 {
-    private Composer $composer;
-
     public array $cache = [];
+    private Composer $composer;
 
     public function __construct(Composer $composer)
     {
@@ -43,7 +42,7 @@ class ConfigLocator
      */
     public function locate(string $key): bool
     {
-        if (array_key_exists($key, $this->cache)) {
+        if (\array_key_exists($key, $this->cache)) {
             return $this->cache[$key]['found'];
         }
 
@@ -80,7 +79,7 @@ class ConfigLocator
 
         $localComposerExtra = $this->composer->getPackage()->getExtra();
 
-        if (array_key_exists($key, $localComposerExtra)) {
+        if (\array_key_exists($key, $localComposerExtra)) {
             $this->cache[$key] = [
                 'found' => true,
                 'config' => $localComposerExtra[$key],
@@ -100,13 +99,13 @@ class ConfigLocator
     {
         $path = $this->composer->getConfig()->get('home');
 
-        $globalComposerJsonFile = $path . '/composer.json';
+        $globalComposerJsonFile = $path.'/composer.json';
 
         if (file_exists($globalComposerJsonFile) && $content = file_get_contents($globalComposerJsonFile)) {
             /** @var array $globalComposerJson */
             $globalComposerJson = json_decode($content, true);
 
-            if (array_key_exists('extra', $globalComposerJson) && array_key_exists($key, $globalComposerJson['extra'])) {
+            if (\array_key_exists('extra', $globalComposerJson) && \array_key_exists($key, $globalComposerJson['extra'])) {
                 $this->cache[$key] = [
                     'found' => true,
                     'config' => $globalComposerJson['extra'][$key],

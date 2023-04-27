@@ -33,11 +33,9 @@ class UpdateOutputFileHandler extends AbstractUpdateHandler
      */
     public function getOutput(OperationInterface $operation, UrlGenerator $urlGenerator = null): array
     {
-        if (!($operation instanceof UpdateOperation)) {
+        if (!$operation instanceof UpdateOperation) {
             throw new \LogicException('Operation should be an instance of UpdateOperation');
         }
-
-        $output = [];
 
         $initialPackage = $operation->getInitialPackage();
         $targetPackage = $operation->getTargetPackage();
@@ -66,7 +64,8 @@ class UpdateOutputFileHandler extends AbstractUpdateHandler
         if (FileOutputter::JSON_FORMAT === $this->outputFormat) {
             return $this->getJsonOutput($initialPackage, $targetPackage, $versionFrom, $versionTo, $action, $urlGenerator);
         }
-            return $this->getTextOutput($initialPackage, $targetPackage, $versionFrom, $versionTo, $action, $urlGenerator);
+
+        return $this->getTextOutput($initialPackage, $targetPackage, $versionFrom, $versionTo, $action, $urlGenerator);
     }
 
     private function getJsonOutput(PackageInterface $initialPackage, PackageInterface $targetPackage, Version $versionFrom, Version $versionTo, string $action, ?UrlGenerator $urlGenerator): array
@@ -74,7 +73,7 @@ class UpdateOutputFileHandler extends AbstractUpdateHandler
         $output['operation'] = 'update';
         $output['package'] = $initialPackage->getName();
         $output['action'] = $action;
-        $output['phrasing'] = $action . ' from';
+        $output['phrasing'] = $action.' from';
         $output['versionFrom'] = $versionFrom->getCliOutput();
         $output['versionTo'] = $versionTo->getCliOutput();
         $output['semver'] = trim($this->getSemverOutput($versionFrom->getName(), $versionTo->getName(), false));

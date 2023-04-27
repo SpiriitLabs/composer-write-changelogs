@@ -25,7 +25,7 @@ abstract class AbstractInstallHandler implements OperationHandler
 
     public function extractSourceUrl(OperationInterface $operation): ?string
     {
-        if (!($operation instanceof InstallOperation)) {
+        if (!$operation instanceof InstallOperation) {
             throw new \LogicException('Operation should be an instance of InstallOperation');
         }
 

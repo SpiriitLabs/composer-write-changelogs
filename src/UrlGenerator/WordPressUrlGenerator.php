@@ -20,9 +20,9 @@ class WordPressUrlGenerator implements UrlGenerator
 {
     public const DOMAIN = 'svn.wordpress.org';
 
-    public function supports(string $sourceUrl): bool
+    public function supports(?string $sourceUrl): bool
     {
-        return false !== strpos($sourceUrl, self::DOMAIN);
+        return false !== strpos($sourceUrl ?? '', self::DOMAIN);
     }
 
     /**
@@ -30,11 +30,11 @@ class WordPressUrlGenerator implements UrlGenerator
      */
     public function generateCompareUrl(?string $sourceUrlFrom, Version $versionFrom, ?string $sourceUrlTo, Version $versionTo): ?string
     {
-        if ((!is_null($sourceUrlFrom) && !$this->supports($sourceUrlFrom)) || (!is_null($sourceUrlTo) && !$this->supports($sourceUrlTo))) {
+        if ((null !== $sourceUrlFrom && !$this->supports($sourceUrlFrom)) || (null !== $sourceUrlTo && !$this->supports($sourceUrlTo))) {
             return null;
         }
 
-        if($sourceUrlTo == null){
+        if (null === $sourceUrlTo) {
             return null;
         }
 

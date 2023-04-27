@@ -12,160 +12,114 @@
 namespace Spiriit\ComposerWriteChangelogs\tests\Config;
 
 use PHPUnit\Framework\TestCase;
+use Spiriit\ComposerWriteChangelogs\Config\Config;
 use Spiriit\ComposerWriteChangelogs\Config\ConfigBuilder;
 
 class ConfigBuilderTest extends TestCase
 {
-    private ConfigBuilder $SUT;
+    private ConfigBuilder $configBuilder;
 
     protected function setUp(): void
     {
-        $this->SUT = new ConfigBuilder();
+        $this->configBuilder = new ConfigBuilder();
     }
 
-    /**
-     * @test
-     */
-    public function test_it_has_a_default_setup(): void
+    public static function configCasesProvider(): \Generator
     {
-        $extra = [];
-
-        $config = $this->SUT->build($extra);
-
-        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
-        $this->assertEmpty($config->getGitlabHosts());
-        $this->assertEquals('text', $config->getOutputFileFormat());
-        $this->assertNull($config->getChangelogsDirPath());
-        $this->assertTrue($config->isWriteSummaryFile());
-
-        $this->assertCount(0, $this->SUT->getWarnings());
-    }
-
-    /**
-     * @test
-     */
-    public function test_it_warns_when_gitlab_hosts_is_not_an_array(): void
-    {
-        $extra = [
-            'gitlab-hosts' => 'gitlab.company1.com',
+        yield 'default setup' => [
+            [],
+            [
+                'getGitlabHosts' => [],
+                'getOutputFileFormat' => 'text',
+                'getChangelogsDirPath' => null,
+                'isWriteSummaryFile' => true,
+                'getWebhookURL' => null,
+            ],
         ];
 
-        $config = $this->SUT->build($extra);
+        yield 'warning : gitlab-hosts not an array' => [
+            [
+                'gitlab-hosts' => 'gitlab.company1.com',
+            ],
+            [
+                'getGitlabHosts' => [],
+            ],
+            [
+                '"gitlab-hosts" is specified but should be an array. Ignoring.',
+            ],
+        ];
 
-        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
-        $this->assertEmpty($config->getGitlabHosts());
+        yield 'warning: changelogs-dir-path specified but empty' => [
+            [
+                'changelogs-dir-path' => ' ',
+            ],
+            [],
+            [
+                '"changelogs-dir-path" is specified but empty. Ignoring and using default changelogs dir path.',
+            ],
+        ];
 
-        $this->assertCount(1, $this->SUT->getWarnings());
-        $this->assertStringContainsString('"gitlab-hosts" is specified but should be an array. Ignoring.', $this->SUT->getWarnings()[0]);
+        yield 'warning: outpt-file-format invalid' => [
+            [
+                'output-file-format' => 'foo',
+            ],
+            [],
+            [
+                'Invalid value "foo" for option "output-file-format", defaulting to "foo". Valid options are "text", "json".',
+            ],
+        ];
+
+        yield 'true: write-summary-file specified empty' => [
+            [
+                'write-summary-file' => '',
+            ],
+            [
+                'isWriteSummaryFile' => true,
+            ],
+        ];
+
+        yield 'true: write-summary-file random string' => [
+            [
+                'write-summary-file' => 'abcdef',
+            ],
+            [
+                'isWriteSummaryFile' => true,
+            ],
+        ];
+
+        yield 'accept: setup valid' => [
+            [
+                'gitlab-hosts' => [
+                    'gitlab.company1.com',
+                    'gitlab.company2.com',
+                ],
+                'changelogs-dir-path' => 'my/custom/path',
+                'output-file-format' => 'text',
+                'write-summary-file' => 'false',
+            ],
+            [
+                'getGitlabHosts' => ['gitlab.company1.com', 'gitlab.company2.com'],
+                'getOutputFileFormat' => 'text',
+                'getChangelogsDirPath' => 'my/custom/path',
+                'isWriteSummaryFile' => false,
+            ],
+        ];
     }
 
     /**
      * @test
+     *
+     * @dataProvider configCasesProvider
      */
-    public function test_it_warns_when_changelogs_dir_path_is_specified_but_empty(): void
+    public function it_builds_config(array $inputConfig, array $expectedConfig, array $expectedWarnings = []): void
     {
-        $extra = [
-            'changelogs-dir-path' => ' ',
-        ];
+        $config = $this->configBuilder->build($inputConfig);
+        $this->assertInstanceOf(Config::class, $config);
 
-        $config = $this->SUT->build($extra);
+        foreach ($expectedConfig as $configKey => $value) {
+            $this->assertSame($expectedConfig[$configKey], $config->{$configKey}());
+        }
 
-        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
-        $this->assertEmpty($config->getGitlabHosts());
-
-        $this->assertCount(1, $this->SUT->getWarnings());
-        $this->assertStringContainsString('"changelogs-dir-path" is specified but empty. Ignoring and using default changelogs dir path.', $this->SUT->getWarnings()[0]);
-    }
-
-    /**
-     * @test
-     */
-    public function test_it_warns_when_output_file_format_is_invalid(): void
-    {
-        $extra = [
-            'output-file-format' => 'foo',
-        ];
-
-        $config = $this->SUT->build($extra);
-
-        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
-        $this->assertEmpty($config->getGitlabHosts());
-
-        $this->assertCount(1, $this->SUT->getWarnings());
-        $this->assertStringContainsString('Invalid value "foo" for option "output-file-format"', $this->SUT->getWarnings()[0]);
-    }
-
-    /**
-     * @test
-     */
-    public function test_it_warns_when_write_summary_file_is_specified_but_empty(): void
-    {
-        $extra = [
-            'write-summary-file' => '',
-        ];
-
-        $config = $this->SUT->build($extra);
-
-        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
-        $this->assertEmpty($config->getGitlabHosts());
-
-        $this->assertTrue($config->isWriteSummaryFile());
-    }
-
-    /**
-     * @test
-     */
-    public function test_it_warns_when_write_summary_file_is_invalid(): void
-    {
-        $extra = [
-            'write-summary-file' => '   ',
-        ];
-
-        $config = $this->SUT->build($extra);
-
-        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
-        $this->assertEmpty($config->getGitlabHosts());
-
-        $this->assertTrue($config->isWriteSummaryFile());
-    }
-
-    /**
-     * @test
-     */
-    public function test_it_warns_when_write_summary_file_is_specified_false(): void
-    {
-        $extra = [
-            'write-summary-file' => 'false',
-        ];
-
-        $config = $this->SUT->build($extra);
-
-        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
-        $this->assertEmpty($config->getGitlabHosts());
-
-        $this->assertFalse($config->isWriteSummaryFile());
-    }
-
-    /**
-     * @test
-     */
-    public function test_it_accepts_valid_setup(): void
-    {
-        $extra = [
-            'gitlab-hosts' => ['gitlab.company1.com', 'gitlab.company2.com'],
-            'changelogs-dir-path' => 'my/custom/path',
-            'output-file-format' => 'text',
-            'write-summary-file' => 'false',
-        ];
-
-        $config = $this->SUT->build($extra);
-
-        $this->assertInstanceOf('Spiriit\ComposerWriteChangelogs\Config\Config', $config);
-        $this->assertCount(2, $config->getGitlabHosts());
-        $this->assertEquals('text', $config->getOutputFileFormat());
-        $this->assertEquals('my/custom/path', $config->getChangelogsDirPath());
-        $this->assertFalse($config->isWriteSummaryFile());
-
-        $this->assertCount(0, $this->SUT->getWarnings());
+        $this->assertSame($expectedWarnings, $this->configBuilder->getWarnings());
     }
 }
