@@ -14,13 +14,13 @@ For the installation of the plugin, you have 2 choices.
 ### Global installation
 You can install the plugin on your computer with the following command
 ```shell
-composer global require "spiriit/composer-write-changelogs"
+composer global require "spiriitlabs/composer-write-changelogs"
 ```
 
 ### Local installation
 You can also install the plugin in a single project with this command
 ```shell
-composer require "spiriit/composer-write-changelogs"
+composer require "spiriitlabs/composer-write-changelogs"
 ```
 
 <br/>
