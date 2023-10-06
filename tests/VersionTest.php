@@ -18,7 +18,7 @@ class VersionTest extends TestCase
 {
     private Version $version;
 
-    public static function keepVersionFormatsProvider(): \Generator
+    public static function provideIt_keep_version_formatsCases(): iterable
     {
         yield 'all sames' => ['V1.0.0.0', 'V1.0.0', 'V1.0.0'];
 
@@ -26,7 +26,7 @@ class VersionTest extends TestCase
     }
 
     /**
-     * @dataProvider keepVersionFormatsProvider
+     * @dataProvider provideIt_keep_version_formatsCases
      *
      * @test
      */
@@ -41,7 +41,7 @@ class VersionTest extends TestCase
     /**
      * Data provider of 'test_it_detects_dev_version' test.
      */
-    public static function detectsDevVersionProvider(): \Generator
+    public static function provideIt_detects_dev_versionCases(): iterable
     {
         yield 'all sames' => ['v1.0.0.0', 'v1.0.0.0', 'v1.0.0.0', false];
 
@@ -51,7 +51,7 @@ class VersionTest extends TestCase
     }
 
     /**
-     * @dataProvider detectsDevVersionProvider
+     * @dataProvider provideIt_detects_dev_versionCases
      *
      * @test
      */

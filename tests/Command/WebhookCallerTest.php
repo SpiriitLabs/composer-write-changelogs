@@ -20,7 +20,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class WebhookCallerTest extends TestCase
 {
-    public static function webhookUrls(): \Generator
+    public static function provideWebhook_caller_testCases(): iterable
     {
         yield 'ok' => [new MockResponse('ok', ['http_code' => 200])];
 
@@ -28,7 +28,7 @@ class WebhookCallerTest extends TestCase
     }
 
     /**
-     * @dataProvider webhookUrls
+     * @dataProvider provideWebhook_caller_testCases
      *
      * @test
      */

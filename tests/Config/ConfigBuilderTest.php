@@ -24,7 +24,7 @@ class ConfigBuilderTest extends TestCase
         $this->configBuilder = new ConfigBuilder();
     }
 
-    public static function configCasesProvider(): \Generator
+    public static function provideIt_builds_configCases(): iterable
     {
         yield 'default setup' => [
             [],
@@ -109,7 +109,7 @@ class ConfigBuilderTest extends TestCase
     /**
      * @test
      *
-     * @dataProvider configCasesProvider
+     * @dataProvider provideIt_builds_configCases
      */
     public function it_builds_config(array $inputConfig, array $expectedConfig, array $expectedWarnings = []): void
     {

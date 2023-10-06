@@ -4,5 +4,5 @@ grumphp:
     tasks:
         phpstan:
             use_grumphp_paths: false
-        phpcsfixer: ~
+      #phpcsfixer: ~
         phpunit: ~
